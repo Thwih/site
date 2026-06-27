@@ -5109,7 +5109,9 @@ window.appendMessage = function(type, text) {
       throw new Error(err.error || `HTTP ${response.status}`);
     }
     const data = await response.json();
-    if (!data.success) throw new Error(data.error || 'Worker error');
+if (!data.success) throw new Error(data.error || 'Worker error');
+songMap.clear();
+data.data.files.forEach(file => {  // ← thêm .data
     
     songMap.clear();
     data.files.forEach(file => {
