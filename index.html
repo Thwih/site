@@ -5114,7 +5114,7 @@ songMap.clear();
 data.data.files.forEach(file => {  // ← thêm .data
     
     songMap.clear();
-    data.files.forEach(file => {
+    data.data.files.forEach(file => {
       songMap.set(file.id, {
         id: file.id,
         name: file.name,
