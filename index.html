@@ -4908,13 +4908,13 @@
                 if (countEl) countEl.textContent = `${songData.length} bài hát`;
 
                 if (showToastOnChange) {
-                    showToast(` Đã cập nhật ${songData.length} bài hát!`, 'success', 3000);
+                    showToast(`Đã cập nhật ${songData.length} bài hát!`, 'success', 3000);
                 }
-                console.log(` Đã tải ${songData.length} file từ Drive qua Worker.`);
+                console.log(`Đã tải ${songData.length} file từ Drive qua Worker.`);
             } catch (error) {
-                console.error(' Lỗi lấy danh sách nhạc:', error);
+                console.error('Lỗi lấy danh sách nhạc:', error);
                 if (showToastOnChange) {
-                    showToast(' Không thể tải danh sách nhạc. Vui lòng thử lại.', 'error', 5000);
+                    showToast('Không thể tải danh sách nhạc. Vui lòng thử lại.', 'error', 5000);
                 }
             } finally {
                 isFetching = false;
@@ -5018,9 +5018,9 @@
             try {
                 const finalLink = await shortenThrice(link);
                 window.open(finalLink, '_blank');
-                showToast(' Đã mở tab với link rút gọn!', 'success', 3000);
+                showToast('Đã mở tab với link rút gọn!', 'success', 3000);
             } catch (error) {
-                showToast('❌ Lỗi: ' + error.message, 'error', 4000);
+                showToast(' Lỗi: ' + error.message, 'error', 4000);
             } finally {
                 setTimeout(() => {
                     nameEl.textContent = originalText;
