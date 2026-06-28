@@ -5109,9 +5109,7 @@ window.appendMessage = function(type, text) {
       throw new Error(err.error || `HTTP ${response.status}`);
     }
     const data = await response.json();
-if (!data.success) throw new Error(data.error || 'Worker error');
-songMap.clear();
-data.data.files.forEach(file => {  // ← thêm .data
+    if (!data.success) throw new Error(data.error || 'Worker error');
     
     songMap.clear();
     data.data.files.forEach(file => {
@@ -6226,7 +6224,7 @@ data.data.files.forEach(file => {  // ← thêm .data
                     } catch (err) {
                         statusEl.className = 'b-status fail';
                         statusEl.innerHTML = `<i class="fas fa-exclamation-circle"></i>`;
-                        titleEl.textContent = '❌ Lỗi: ' + (err.message || 'Không xác định');
+                        titleEl.textContent = 'Lỗi: ' + (err.message || 'Không xác định');
                         titleEl.className = 'b-title fail';
                         failCount++;
                     }
@@ -6287,7 +6285,7 @@ data.data.files.forEach(file => {  // ← thêm .data
                         renderResult(data);
                     } catch (error) {
                         console.error('Lỗi tải TikTok:', error);
-                        showError('❌ Không thể tải video.', error.message || 'Vui lòng kiểm tra link hoặc thử lại sau.');
+                        showError('Không thể tải video.', error.message || 'Vui lòng kiểm tra link hoặc thử lại sau.');
                         tikResult.classList.remove('show');
                         clearProgress();
                     } finally {
@@ -6309,7 +6307,7 @@ data.data.files.forEach(file => {  // ← thêm .data
                         await processBatch(links);
                     } catch (error) {
                         console.error('Lỗi batch:', error);
-                        showError('❌ Lỗi xử lý batch.', error.message);
+                        showError('Lỗi xử lý batch.', error.message);
                     } finally {
                         tikFetchBtn.disabled = false;
                         tikFetchBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Tải xuống';
