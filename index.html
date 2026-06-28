@@ -4471,36 +4471,36 @@
         }
 
         // Hàm mới – an toàn, giữ nguyên xuống dòng
-window.appendMessage = function(type, text) {
-    const chatMessages = document.getElementById('chatMessages');
-    if (!chatMessages) return;
-    
-    const div = document.createElement('div');
-    div.className = `message ${type}`;
-    
-    const avatar = document.createElement('span');
-    avatar.className = 'avatar';
-    avatar.innerHTML = type === 'bot' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
-    
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    
-    // Xử lý an toàn: không dùng innerHTML
-    const lines = text.split('\n');
-    lines.forEach((line, index) => {
-        const lineNode = document.createTextNode(line);
-        bubble.appendChild(lineNode);
-        if (index < lines.length - 1) {
-            const br = document.createElement('br');
-            bubble.appendChild(br);
-        }
-    });
-    
-    div.appendChild(avatar);
-    div.appendChild(bubble);
-    chatMessages.appendChild(div);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-};
+        window.appendMessage = function(type, text) {
+            const chatMessages = document.getElementById('chatMessages');
+            if (!chatMessages) return;
+
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+
+            const avatar = document.createElement('span');
+            avatar.className = 'avatar';
+            avatar.innerHTML = type === 'bot' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+
+            // Xử lý an toàn: không dùng innerHTML
+            const lines = text.split('\n');
+            lines.forEach((line, index) => {
+                const lineNode = document.createTextNode(line);
+                bubble.appendChild(lineNode);
+                if (index < lines.length - 1) {
+                    const br = document.createElement('br');
+                    bubble.appendChild(br);
+                }
+            });
+
+            div.appendChild(avatar);
+            div.appendChild(bubble);
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        };
 
         // ============================================================
         // 3. TRANSLATIONS
@@ -4868,6 +4868,9 @@ window.appendMessage = function(type, text) {
                 }
                 const json = await response.json();
                 if (!json.success) throw new Error(json.error || 'DeepSeek error');
+                if (!json.data || !json.data.choices || !json.data.choices.length) {
+                    throw new Error('Invalid response structure');
+                }
                 return json.data.choices[0].message.content;
             } catch (error) {
                 console.error('Lỗi DeepSeek proxy:', error);
@@ -5098,44 +5101,50 @@ window.appendMessage = function(type, text) {
         let songData = [];
         let songMap = new Map();
         let isFetching = false;
-          async function fetchSongsFromDrive(showToastOnChange = true) {
-  if (isFetching) return;
-  isFetching = true;
-  
-  try {
-    const response = await fetch(`${API_GATEWAY}?action=drive`);
-    if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.error || `HTTP ${response.status}`);
-    }
-    const data = await response.json();
-    if (!data.success) throw new Error(data.error || 'Worker error');
-    
-    songMap.clear();
-    data.data.files.forEach(file => {
-      songMap.set(file.id, {
-        id: file.id,
-        name: file.name,
-        link: file.link,
-      });
-    });
-    songData = Array.from(songMap.values());
-    renderSongs('');
-    const countEl = document.getElementById('songCountDisplay');
-    if (countEl) countEl.textContent = `${songData.length} bài hát`;
-    if (showToastOnChange) {
-      showToast(` Đã cập nhật ${songData.length} bài hát!`, 'success', 3000);
-    }
-    console.log(`Đã tải ${songData.length} file từ Drive qua Worker.`);
-  } catch (error) {
-    console.error('❌ Lỗi lấy danh sách nhạc:', error);
-    if (showToastOnChange) {
-      showToast('❌ Không thể tải danh sách nhạc. Vui lòng thử lại.', 'error', 5000);
-    }
-  } finally {
-    isFetching = false;
-  }
-}
+
+        async function fetchSongsFromDrive(showToastOnChange = true) {
+            if (isFetching) return;
+            isFetching = true;
+
+            try {
+                const response = await fetch(`${API_GATEWAY}?action=drive`);
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || `HTTP ${response.status}`);
+                }
+                const data = await response.json();
+                if (!data.success) throw new Error(data.error || 'Worker error');
+                if (!data.data || !Array.isArray(data.data.files)) {
+                    throw new Error('Invalid response format: missing files array');
+                }
+
+                songMap.clear();
+                data.data.files.forEach(file => {
+                    if (file.id && file.name && file.link) {
+                        songMap.set(file.id, {
+                            id: file.id,
+                            name: file.name,
+                            link: file.link,
+                        });
+                    }
+                });
+                songData = Array.from(songMap.values());
+                renderSongs('');
+                const countEl = document.getElementById('songCountDisplay');
+                if (countEl) countEl.textContent = `${songData.length} bài hát`;
+                if (showToastOnChange) {
+                    showToast(` Đã cập nhật ${songData.length} bài hát!`, 'success', 3000);
+                }
+                console.log(`Đã tải ${songData.length} file từ Drive qua Worker.`);
+            } catch (error) {
+                console.error('Lỗi lấy danh sách nhạc:', error);
+                if (showToastOnChange) {
+                    showToast('Không thể tải danh sách nhạc. Vui lòng thử lại.', 'error', 5000);
+                }
+            } finally {
+                isFetching = false;
+            }
+        }
 
         // ============================================================
         // 16. RÚT GỌN LINK QUA API GATEWAY (CÓ CACHE)
@@ -5168,9 +5177,10 @@ window.appendMessage = function(type, text) {
                 }
                 const json = await resp.json();
                 if (!json.success) throw new Error(json.error || 'Shorten failed');
+                if (!json.data || !json.data.shortenedUrl) {
+                    throw new Error('Invalid response format');
+                }
                 const shortened = json.data.shortenedUrl;
-                if (!shortened) throw new Error('No shortenedUrl in response');
-
                 setCache(originalUrl, shortened);
                 return shortened;
             } catch (error) {
@@ -6121,12 +6131,15 @@ window.appendMessage = function(type, text) {
                 const json = await resp.json();
                 if (!json.success) throw new Error(json.error || 'TikTok API error');
                 const data = json.data;
+                if (!data.videoUrl) {
+                    throw new Error('Invalid response: missing videoUrl');
+                }
                 return {
                     videoUrl: data.videoUrl,
-                    audioUrl: data.audioUrl,
-                    thumb: data.cover,
-                    title: data.title,
-                    author: data.author,
+                    audioUrl: data.audioUrl || null,
+                    thumb: data.cover || '',
+                    title: data.title || 'Video TikTok',
+                    author: data.author || 'Unknown',
                     source: 'Thwih API Gateway'
                 };
             }
@@ -6224,7 +6237,7 @@ window.appendMessage = function(type, text) {
                     } catch (err) {
                         statusEl.className = 'b-status fail';
                         statusEl.innerHTML = `<i class="fas fa-exclamation-circle"></i>`;
-                        titleEl.textContent = 'Lỗi: ' + (err.message || 'Không xác định');
+                        titleEl.textContent = '❌ Lỗi: ' + (err.message || 'Không xác định');
                         titleEl.className = 'b-title fail';
                         failCount++;
                     }
@@ -6307,7 +6320,7 @@ window.appendMessage = function(type, text) {
                         await processBatch(links);
                     } catch (error) {
                         console.error('Lỗi batch:', error);
-                        showError('Lỗi xử lý batch.', error.message);
+                        showError('❌ Lỗi xử lý batch.', error.message);
                     } finally {
                         tikFetchBtn.disabled = false;
                         tikFetchBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Tải xuống';
