@@ -5670,9 +5670,9 @@
 			        }
 
 			     // ============================================================
-// 16. RÚT GỌN LINK QUA WORKER (LAYMA.NET) – CÓ CACHE MỚI
+// 16. RÚT GỌN LINK (LAYMA 1 LẦN + REDIRECT 2 LẦN) – VƯỢT 3 LẦN
 // ============================================================
-const CACHE_KEY = 'shorten_cache_v2';   // đổi key để xóa cache cũ
+const CACHE_KEY = 'shorten_cache_v5';
 
 function getCache() {
     try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || {}; } catch { return {}; }
@@ -5684,39 +5684,53 @@ function setCache(originalUrl, shortenedUrl) {
     try { localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); } catch (e) {}
 }
 
+async function shortenOnce(url) {
+    const resp = await fetch(`${API_GATEWAY}?action=shorten&url=${encodeURIComponent(url)}`);
+    if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.error || `HTTP ${resp.status}`);
+    }
+    const json = await resp.json();
+    if (!json.success || !json.data || !json.data.shortenedUrl) {
+        throw new Error('Worker trả về dữ liệu không hợp lệ');
+    }
+    return json.data.shortenedUrl;
+}
+
+// Tạo link redirect qua Worker
+function createRedirectUrl(target) {
+    return `${API_GATEWAY}?action=redirect&url=${encodeURIComponent(target)}`;
+}
+
 async function shortenThrice(originalUrl) {
-    let cache = getCache();
+    const cache = getCache();
     if (cache[originalUrl]) {
-        // Nếu cache vẫn còn link traffic cũ thì xóa
-        if (cache[originalUrl].includes('trafficvn.com')) {
-            delete cache[originalUrl];
-            localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-            console.log('🗑️ Xóa cache traffic cũ');
-        } else {
-            console.log('✅ Lấy từ cache:', cache[originalUrl]);
-            return cache[originalUrl];
-        }
+        console.log('✅ Lấy từ cache (đã qua 3 lần):', cache[originalUrl]);
+        return cache[originalUrl];
     }
 
     try {
-        const resp = await fetch(`${API_GATEWAY}?action=shorten&url=${encodeURIComponent(originalUrl)}`);
-        if (!resp.ok) {
-            const err = await resp.json();
-            throw new Error(err.error || `HTTP ${resp.status}`);
-        }
-        const json = await resp.json();
-        if (!json.success || !json.data || !json.data.shortenedUrl) {
-            throw new Error('Worker trả về dữ liệu không hợp lệ');
-        }
-        const shortened = json.data.shortenedUrl;
-        setCache(originalUrl, shortened);
-        return shortened;
+        let currentUrl = originalUrl;
+        // Lần 1: rút gọn bằng LAYMA
+        console.log(`⏳ Vượt link lần 1 (shorten): ${currentUrl}`);
+        currentUrl = await shortenOnce(currentUrl);
+        console.log(`   -> ${currentUrl}`);
+        // Lần 2: redirect qua Worker
+        console.log(`⏳ Vượt link lần 2 (redirect): ${currentUrl}`);
+        currentUrl = createRedirectUrl(currentUrl);
+        console.log(`   -> ${currentUrl}`);
+        // Lần 3: redirect qua Worker
+        console.log(`⏳ Vượt link lần 3 (redirect): ${currentUrl}`);
+        currentUrl = createRedirectUrl(currentUrl);
+        console.log(`   -> ${currentUrl}`);
+        setCache(originalUrl, currentUrl);
+        console.log('✅ Link cuối cùng sau 3 lần:', currentUrl);
+        return currentUrl;
     } catch (error) {
-        console.error('❌ Lỗi shorten:', error);
-        throw error; // sẽ hiển thị toast lỗi
+        console.error('❌ Lỗi vượt link, fallback về link gốc:', error);
+        return originalUrl;
     }
 }
-
 			        // ============================================================
 			        // 17. HIỂN THỊ LOADING PAGE (TẠO LINK)
 			        // ============================================================
@@ -5942,7 +5956,7 @@ async function shortenThrice(originalUrl) {
 			                    `);
 			                    newTab.document.title = 'Đang tạo link...';
 			                } else {
-			                    showToast('⚠️ Pop-up bị chặn!', 'error', 4000);
+			                    showToast('Pop-up bị chặn!', 'error', 4000);
 			                }
 			            } catch (e) {
 			                console.warn('Không thể mở tab mới:', e);
