@@ -32,8 +32,6 @@
             color: var(--text-primary);
             transition: background 0.6s ease, color 0.4s ease;
         }
-
-        /* ===== THEME ===== */
         :root {
             --bg-primary: radial-gradient(ellipse at 30% 20%, #0d1a2e 0%, #080f1a 40%, #040810 80%);
             --bg-secondary: #0a1420;
@@ -4436,7 +4434,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- JAVASCRIPT (ĐÃ CẬP NHẬT GỌI QUA API GATEWAY) -->
+    <!-- JAVASCRIPT (HOÀN CHỈNH) -->
     <!-- ============================================================ -->
     <script>
         // ============================================================
@@ -4452,11 +4450,7 @@
             if (!container) return;
             const toast = document.createElement('div');
             toast.className = `toast-item ${type}`;
-            const iconMap = {
-                error: 'fa-exclamation-circle',
-                success: 'fa-check-circle',
-                info: 'fa-info-circle'
-            };
+            const iconMap = { error: 'fa-exclamation-circle', success: 'fa-check-circle', info: 'fa-info-circle' };
             toast.innerHTML = `
                 <i class="fas ${iconMap[type] || iconMap.info}"></i>
                 <span>${message}</span>
@@ -4470,22 +4464,22 @@
             }, duration);
         }
 
-        // Hàm mới – an toàn, giữ nguyên xuống dòng
+        // ============================================================
+        // 2. APPEND MESSAGE (TOÀN CỤC) – ĐÃ SỬA LỖI
+        // ============================================================
         window.appendMessage = function(type, text) {
             const chatMessages = document.getElementById('chatMessages');
-            if (!chatMessages) return;
-
+            if (!chatMessages) {
+                console.warn('chatMessages not found, message:', text);
+                return;
+            }
             const div = document.createElement('div');
             div.className = `message ${type}`;
-
             const avatar = document.createElement('span');
             avatar.className = 'avatar';
             avatar.innerHTML = type === 'bot' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
-
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
-
-            // Xử lý an toàn: không dùng innerHTML
             const lines = text.split('\n');
             lines.forEach((line, index) => {
                 const lineNode = document.createTextNode(line);
@@ -4495,7 +4489,6 @@
                     bubble.appendChild(br);
                 }
             });
-
             div.appendChild(avatar);
             div.appendChild(bubble);
             chatMessages.appendChild(div);
@@ -4689,11 +4682,9 @@
             });
             localStorage.setItem('lang', lang);
             document.documentElement.lang = lang;
-
             const chatMessages = document.getElementById('chatMessages');
             if (chatMessages && chatMessages.children.length === 0 && typeof window.appendMessage === 'function') {
-                const welcomeMsg = t.ai_welcome || 'Hello! I am the AI assistant. How can I help you? 🎵';
-                window.appendMessage('bot', welcomeMsg);
+                window.appendMessage('bot', t.ai_welcome);
             }
             const playerSongName = document.getElementById('playerSongName');
             const playerArtistName = document.getElementById('playerArtistName');
@@ -4720,7 +4711,6 @@
                 star.style.setProperty('--duration', (Math.random() * 4 + 2) + 's');
                 star.style.animationDelay = (Math.random() * 6) + 's';
                 star.style.boxShadow = `0 0 ${size * 2}px ${size * 0.8}px rgba(74, 158, 255, 0.25)`;
-                star.style.willChange = 'transform, opacity';
                 container.appendChild(star);
             }
         })();
@@ -4750,11 +4740,11 @@
         const html = document.documentElement;
         let currentTheme = localStorage.getItem('theme') || 'dark';
         html.setAttribute('data-theme', currentTheme);
-        updateToggleUI(currentTheme);
 
         function updateToggleUI(theme) {
             if (icon) icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
         }
+        updateToggleUI(currentTheme);
         if (toggle) {
             toggle.addEventListener('click', () => {
                 const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -4770,7 +4760,6 @@
         const bell = document.getElementById('bellNotification');
         const modalOverlay = document.getElementById('modalOverlay');
         const closeModalBtn = document.getElementById('closeModalBtn');
-
         if (bell && modalOverlay && closeModalBtn) {
             bell.addEventListener('click', function() {
                 this.classList.add('ring');
@@ -4813,7 +4802,7 @@
         }
 
         // ============================================================
-        // 11. CHAT – GỌI DEEPSEEK QUA API GATEWAY
+        // 11. CHAT – GỌI DEEPSEEK QUA API GATEWAY (GIỮ NGUYÊN)
         // ============================================================
         const chatToggle = document.getElementById('chatToggle');
         const chatBox = document.getElementById('chatBox');
@@ -4822,7 +4811,6 @@
         const chatSend = document.getElementById('chatSend');
         const chatMessages = document.getElementById('chatMessages');
 
-        // Hàm fallback khi không gọi được DeepSeek
         function getFallbackReply(message) {
             const msg = message.toLowerCase().trim();
             if (msg.includes('xin chào') || msg.includes('chào') || msg.includes('hello') || msg.includes('hi')) {
@@ -4847,7 +4835,6 @@
             return `🤔 Tôi chưa hiểu rõ câu hỏi. Bạn có thể hỏi về:\n- 🎵 Âm nhạc và tải nhạc\n- 📱 Kết nối TikTok, Telegram, Zalo\n- 💻 Lập trình\n- ✉️ Gửi nhạc cho admin`;
         }
 
-        // Gọi DeepSeek qua API Gateway
         async function callDeepSeekAPI(userMessage) {
             try {
                 const response = await fetch(`${API_GATEWAY}?action=deepseek`, {
@@ -4914,15 +4901,13 @@
                     if (isFirstOpen) {
                         const lang = localStorage.getItem('lang') || 'vi';
                         const t = translations[lang];
-                        const welcomeMsg = t.ai_welcome || 'Hello! I am the AI assistant. How can I help you? 🎵';
                         setTimeout(() => {
-                            window.appendMessage('bot', welcomeMsg);
+                            window.appendMessage('bot', t.ai_welcome);
                         }, 400);
                         isFirstOpen = false;
                     }
                 }
             });
-
             chatClose.addEventListener('click', () => chatBox.classList.remove('active'));
 
             async function sendMessage() {
@@ -4937,7 +4922,7 @@
                     window.appendMessage('bot', reply);
                 } catch (error) {
                     removeTyping(typingId);
-                    window.appendMessage('bot', '⚠️ Có lỗi, vui lòng thử lại!');
+                    window.appendMessage('bot', ' Có lỗi, vui lòng thử lại!');
                 }
             }
             chatSend.addEventListener('click', sendMessage);
@@ -4968,7 +4953,6 @@
                     }, 400);
                 }
             }, 80);
-
             setTimeout(() => {
                 if (percent < 100) {
                     clearInterval(loadInterval);
@@ -5076,7 +5060,7 @@
                         if (chatMessages) {
                             window.appendMessage('user', `📩 Tôi vừa gửi một yêu cầu nhạc cho Admin: "${songName}"`);
                             window.appendMessage('bot',
-                                `Cảm ơn bạn! Yêu cầu nhạc của bạn đã được gửi đến hòm thư của Admin qua FormSubmit. Admin sẽ sớm liên hệ lại với bạn!`
+                                ` Cảm ơn bạn! Yêu cầu nhạc của bạn đã được gửi đến hòm thư của Admin. Admin sẽ sớm liên hệ lại với bạn!`
                                 );
                         }
                         if (chatBox && !chatBox.classList.contains('active')) chatBox.classList.add('active');
@@ -5105,7 +5089,6 @@
         async function fetchSongsFromDrive(showToastOnChange = true) {
             if (isFetching) return;
             isFetching = true;
-
             try {
                 const response = await fetch(`${API_GATEWAY}?action=drive`);
                 if (!response.ok) {
@@ -5117,7 +5100,6 @@
                 if (!data.data || !Array.isArray(data.data.files)) {
                     throw new Error('Invalid response format: missing files array');
                 }
-
                 songMap.clear();
                 data.data.files.forEach(file => {
                     if (file.id && file.name && file.link) {
@@ -5147,42 +5129,54 @@
         }
 
         // ============================================================
-        // 16. RÚT GỌN LINK – VƯỢT 3 LẦN (GIỮ NGUYÊN 1 LẦN GỌI API)
+        // 16. RÚT GỌN LINK – VƯỢT 3 LẦN (gọi riêng lẻ, có cache)
         // ============================================================
-        const CACHE_KEY = 'shorten_cache_v6';
+        const CACHE_KEY = 'shorten_cache_v8';
 
         function getCache() {
             try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || {}; } catch { return {}; }
         }
 
-        function setCache(originalUrl, shortenedUrl) {
+        function setCache(originalUrl, cachedUrl) {
             const cache = getCache();
-            cache[originalUrl] = shortenedUrl;
+            cache[originalUrl] = cachedUrl;
             try { localStorage.setItem(CACHE_KEY, JSON.stringify(cache)); } catch (e) {}
+        }
+
+        async function shortenOnce(url) {
+            const resp = await fetch(`${API_GATEWAY}?action=shorten&url=${encodeURIComponent(url)}`);
+            if (!resp.ok) {
+                const err = await resp.json();
+                throw new Error(err.error || `HTTP ${resp.status}`);
+            }
+            const json = await resp.json();
+            if (!json.success || !json.data || !json.data.shortenedUrl) {
+                throw new Error('Worker trả về dữ liệu không hợp lệ');
+            }
+            return json.data.shortenedUrl;
         }
 
         async function shortenThrice(originalUrl) {
             const cache = getCache();
             if (cache[originalUrl]) {
-                console.log(' Lấy từ cache:', cache[originalUrl]);
+                console.log(' Lấy từ cache (đã qua 3 lần):', cache[originalUrl]);
                 return cache[originalUrl];
             }
 
             try {
-                // Gọi API 1 lần – Worker sẽ xử lý 3 lần rút gọn bên trong
-                const resp = await fetch(`${API_GATEWAY}?action=shorten&url=${encodeURIComponent(originalUrl)}`);
-                if (!resp.ok) {
-                    const err = await resp.json();
-                    throw new Error(err.error || `HTTP ${resp.status}`);
-                }
-                const json = await resp.json();
-                if (!json.success || !json.data || !json.data.shortenedUrl) {
-                    throw new Error('Worker trả về dữ liệu không hợp lệ');
-                }
-                const finalUrl = json.data.shortenedUrl;
-                setCache(originalUrl, finalUrl);
-                console.log(' Link cuối cùng:', finalUrl);
-                return finalUrl;
+                let currentUrl = originalUrl;
+                console.log(`⏳ Lần 1: ${currentUrl}`);
+                currentUrl = await shortenOnce(currentUrl);
+                console.log(`   -> ${currentUrl}`);
+                console.log(`⏳ Lần 2: ${currentUrl}`);
+                currentUrl = await shortenOnce(currentUrl);
+                console.log(`   -> ${currentUrl}`);
+                console.log(`⏳ Lần 3: ${currentUrl}`);
+                currentUrl = await shortenOnce(currentUrl);
+                console.log(`   -> ${currentUrl}`);
+                setCache(originalUrl, currentUrl);
+                console.log(' Link cuối cùng:', currentUrl);
+                return currentUrl;
             } catch (error) {
                 console.error('❌ Lỗi vượt link, fallback về link gốc:', error);
                 return originalUrl;
@@ -5190,60 +5184,12 @@
         }
 
         // ============================================================
-        // 17. HIỂN THỊ LOADING PAGE (TẠO LINK)
+        // 17. HIỂN THỊ LOADING PAGE (TẠO LINK) – (không dùng, nhưng giữ)
         // ============================================================
-        function showLoadingPage(totalSteps) {
-            let overlay = document.getElementById('loadingPageOverlay');
-            if (!overlay) {
-                overlay = document.createElement('div');
-                overlay.id = 'loadingPageOverlay';
-                overlay.className = 'loading-page-overlay';
-                overlay.innerHTML = `
-                    <div class="loading-page-card">
-                        <div class="lp-icon"><div class="spinner-ring"></div></div>
-                        <div class="lp-title">Đang tạo link</div>
-                        <div class="lp-progress-wrap">
-                            <div class="lp-progress-bar"><div class="lp-progress-fill" id="lpProgressFill"></div></div>
-                            <div class="lp-progress-text">
-                                <span id="lpProgressLabel">Đang xử lý...</span>
-                                <span class="lp-percent" id="lpPercent">0%</span>
-                            </div>
-                        </div>
-                        <div class="lp-footer"><i class="fas fa-music"></i><span class="brand">Thwih</span></div>
-                    </div>
-                `;
-                document.body.appendChild(overlay);
-            }
-            const fill = document.getElementById('lpProgressFill');
-            const label = document.getElementById('lpProgressLabel');
-            const percent = document.getElementById('lpPercent');
-
-            function updateProgress(pct, msg) {
-                if (fill) {
-                    const val = Math.min(pct, 100);
-                    fill.style.width = val + '%';
-                    fill.classList.toggle('shimmer', val >= 100);
-                }
-                if (percent) percent.textContent = Math.round(Math.min(pct, 100)) + '%';
-                if (label && msg) label.textContent = msg;
-            }
-
-            function complete(msg) {
-                updateProgress(100, msg || 'Hoàn tất!');
-                setTimeout(close, 1500);
-            }
-
-            function close() {
-                if (overlay) overlay.classList.add('hidden');
-                setTimeout(() => { if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 400);
-            }
-            overlay.classList.remove('hidden');
-            updateProgress(0, 'Bắt đầu...');
-            return { updateProgress, complete, close };
-        }
+        // (Bỏ qua vì ta dùng tab mới)
 
         // ============================================================
-        // 18. RENDER DANH SÁCH + XỬ LÝ CLICK (ĐÃ CẬP NHẬT)
+        // 18. RENDER DANH SÁCH + XỬ LÝ CLICK
         // ============================================================
         const searchInput = document.getElementById('searchInput');
         const clearSearch = document.getElementById('clearSearch');
@@ -5426,14 +5372,17 @@
                     `);
                     newTab.document.title = 'Đang tạo link...';
                 } else {
-                    showToast('Pop-up bị chặn!', 'error', 4000);
+                    showToast(' Pop-up bị chặn!', 'error', 4000);
                 }
             } catch (e) {
                 console.warn('Không thể mở tab mới:', e);
             }
 
             try {
-                // Gọi API 1 lần (như cũ) nhưng mô phỏng tiến trình 3 bước
+                // 1. Gọi vượt 3 lần (có cache) – bắt buộc phải qua Layma
+                const finalLink = await shortenThrice(originalLink);
+
+                // 2. Cập nhật tiến trình trên tab: mô phỏng 3 bước
                 let progress = 0;
                 const interval = setInterval(() => {
                     if (newTab && !newTab.closed) {
@@ -5445,19 +5394,22 @@
                     }
                 }, 300);
 
-                const finalLink = await shortenThrice(originalLink);
+                // 3. Chờ một lát rồi mở link cuối cùng (đã qua 3 lần)
+                setTimeout(() => {
+                    clearInterval(interval);
+                    if (newTab && !newTab.closed) {
+                        newTab.updateProgress(100);
+                        setTimeout(() => {
+                            if (!newTab.closed) {
+                                newTab.location.href = finalLink; // MỞ LINK RÚT GỌN CUỐI CÙNG
+                            }
+                        }, 500);
+                    } else {
+                        window.open(finalLink, '_blank');
+                    }
+                    showToast(' Đã mở tab với link rút gọn!', 'success', 3000);
+                }, 3000); // 3 giây để hiển thị 3 bước
 
-                clearInterval(interval);
-                if (newTab && !newTab.closed) {
-                    newTab.updateProgress(100);
-                    setTimeout(() => {
-                        if (!newTab.closed) newTab.location.href = finalLink;
-                    }, 500);
-                } else {
-                    window.open(finalLink, '_blank');
-                }
-                showToast('Đã mở tab với link rút gọn!', 'success', 3000);
-                console.log(`Đã mở tab: ${finalLink}`);
             } catch (error) {
                 console.error('Lỗi:', error);
                 showToast('❌ Đã xảy ra lỗi, vui lòng thử lại!', 'error', 4000);
@@ -5482,14 +5434,11 @@
             if (!songListEl) return;
             const q = filter.trim().toLowerCase();
             const filtered = q ? songData.filter(s => s.name.toLowerCase().includes(q)) : songData;
-
             songCountDisplay.textContent = `${filtered.length} bài hát`;
-
             if (filtered.length === 0) {
                 songListEl.innerHTML = `<div class="no-result"><i class="fas fa-music-slash"></i> Không tìm thấy bài hát nào</div>`;
                 return;
             }
-
             let html = '';
             filtered.forEach((song, index) => {
                 const displayName = truncateName(song.name, 55);
@@ -5511,17 +5460,13 @@
                     </div>
                 `;
             });
-
             songListEl.innerHTML = html;
-
             document.querySelectorAll('.song-item').forEach(el => {
                 const link = el.dataset.link;
-
                 el.addEventListener('click', function(e) {
                     if (e.target.closest('.actions')) return;
                     handleSongClick(link, this);
                 });
-
                 const downloadBtn = el.querySelector('.download-btn');
                 if (downloadBtn) {
                     downloadBtn.addEventListener('click', function(e) {
@@ -5557,9 +5502,7 @@
                 textSpan.textContent = 'Đang cập nhật...';
                 this.style.opacity = '0.7';
                 this.style.pointerEvents = 'none';
-
                 await fetchSongsFromDrive(true);
-
                 icon.classList.remove('fa-spin');
                 textSpan.textContent = originalText;
                 this.style.opacity = '1';
@@ -5568,7 +5511,7 @@
         }
 
         // ============================================================
-        // 19. PLAYER (giữ nguyên như cũ – vẫn dùng jsmediatags)
+        // 19. PLAYER (MusicPlayer)
         // ============================================================
         class MusicPlayer {
             constructor() {
@@ -5580,7 +5523,7 @@
                 this.repeatMode = 0;
                 this.currentTime = 0;
                 this.totalTime = 0;
-                this.progressRAF = null;
+                this.progressInterval = null;
                 this.isTransitioning = false;
 
                 this.cover = document.getElementById('playerCover');
@@ -5724,16 +5667,14 @@
             handleUpload(event) {
                 const file = event.target.files[0];
                 if (!file) return;
-
                 const fileName = file.name.toLowerCase();
                 const isValidExt = fileName.endsWith('.mp3') || fileName.endsWith('.wav');
                 const isValidType = file.type === 'audio/mpeg' || file.type === 'audio/wav' || file.type === 'audio/x-wav';
                 if (!isValidExt || !isValidType) {
-                    alert('⚠️ Chỉ hỗ trợ tải lên file MP3 hoặc WAV. Vui lòng chọn đúng định dạng.');
+                    alert(' Chỉ hỗ trợ tải lên file MP3 hoặc WAV. Vui lòng chọn đúng định dạng.');
                     event.target.value = '';
                     return;
                 }
-
                 const url = URL.createObjectURL(file);
                 let name = file.name.replace(/\.[^/.]+$/, '');
                 if (name.length > 30) name = name.substring(0, 27) + '...';
@@ -5939,7 +5880,7 @@
         }
 
         // ============================================================
-        // 20. TIKTOK DOWNLOADER – GỌI QUA API GATEWAY (ĐÃ SỬA LỖI 401)
+        // 20. TIKTOK DOWNLOADER (HOÀN CHỈNH)
         // ============================================================
         (function() {
             const tikUrlInput = document.getElementById('tikUrlInput');
@@ -6010,14 +5951,6 @@
                     /^https?:\/\/(www\.)?tiktok\.com\/@[\w.]+\/photo\/\d+/i
                 ];
                 return patterns.some(pattern => pattern.test(url));
-            }
-
-            function normalizeUrl(url) {
-                if (!url) return '';
-                url = url.trim();
-                if (url.startsWith('http://') || url.startsWith('https://')) return url;
-                if (url.startsWith('//')) return 'https:' + url;
-                return 'https://' + url;
             }
 
             document.querySelectorAll('.opt-item input[type="checkbox"]').forEach(cb => {
@@ -6152,7 +6085,6 @@
                 isProgressComplete = false;
             }
 
-            // ===== CẬP NHẬT: BẮT LỖI 401 VÀ HIỂN THỊ THÂN THIỆN =====
             async function fetchTikTokViaWorker(url) {
                 try {
                     const resp = await fetch(`${API_GATEWAY}?action=tiktok&url=${encodeURIComponent(url)}`);
@@ -6162,7 +6094,6 @@
                         try {
                             const errJson = await resp.json();
                             if (resp.status === 401 || (errJson.code && errJson.code === '10401')) {
-                                // Lỗi API key không hợp lệ -> thông báo bảo trì
                                 throw new Error('Dịch vụ TikTok hiện đang bảo trì. Vui lòng thử lại sau.');
                             }
                             errMsg = errJson.message || errMsg;
@@ -6297,7 +6228,7 @@
                 let finalMsg = '';
                 if (failCount === 0) finalMsg = `🎉 Tất cả ${successCount} link đều tải thành công!`;
                 else if (successCount === 0) finalMsg = `❌ Tất cả ${failCount} link đều thất bại. Vui lòng kiểm tra lại.`;
-                else finalMsg = `${successCount} thành công, ❌ ${failCount} thất bại.`;
+                else finalMsg = ` ${successCount} thành công, ❌ ${failCount} thất bại.`;
                 batchSummary.textContent = finalMsg;
                 batchSummary.classList.add('show');
                 const existingBtn = document.querySelector('.batch-download-all');
@@ -6318,7 +6249,6 @@
                 clearProgress();
             }
 
-            // ===== XỬ LÝ SỰ KIỆN CLICK NÚT TẢI =====
             tikFetchBtn.addEventListener('click', async function() {
                 clearResult();
                 hideError();
@@ -6394,8 +6324,8 @@
             setInterval(() => fetchSongsFromDrive(false), 60000);
         });
 
-        console.log('✅ Đã cập nhật toàn bộ API qua Gateway: ' + API_GATEWAY);
-        console.log('🔐 Các API key đã được di chuyển an toàn lên Worker.');
+        console.log('Ứng dụng đã sẵn sàng.');
+        console.log('🔗 API Gateway:', API_GATEWAY);
     </script>
 </body>
 </html>
