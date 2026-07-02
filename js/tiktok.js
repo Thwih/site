@@ -1,4 +1,7 @@
-import { API_GATEWAY, showToast } from './utils.js';
+// ===== tiktok.js =====
+// Nhập đúng module
+import { API_GATEWAY } from './config.js';
+import { showToast } from './utils.js';
 
 export class TikTokDownloader {
   constructor() {
@@ -28,6 +31,7 @@ export class TikTokDownloader {
     this.progressLabel = document.getElementById('tikProgressLabel');
     this.percentLabel = document.getElementById('tikPercentLabel');
 
+    // Options checkbox toggle
     document.querySelectorAll('.opt-item input[type="checkbox"]').forEach(cb => {
       const label = cb.closest('.opt-item');
       const update = () => label.classList.toggle('active', cb.checked);
