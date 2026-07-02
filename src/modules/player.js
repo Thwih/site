@@ -1,6 +1,4 @@
-// Player class
 import { showToast } from './toast';
-import { translations } from '../i18n'; // cần import để lấy text khi không có nhạc
 
 export class MusicPlayer {
   constructor() {
@@ -15,7 +13,6 @@ export class MusicPlayer {
     this.progressInterval = null;
     this.isTransitioning = false;
 
-    // DOM refs
     this.cover = document.getElementById('playerCover');
     this.songName = document.getElementById('playerSongName');
     this.artistName = document.getElementById('playerArtistName');
@@ -32,7 +29,26 @@ export class MusicPlayer {
     this.prevBtn = document.getElementById('prevBtn');
     this.nextBtn = document.getElementById('nextBtn');
 
-    // Audio events
+    this._bindEvents();
+    this.renderPlaylist();
+    this.updatePlaylistCount();
+    this.updateDisplay();
+    const lang = localStorage.getItem('lang') || 'vi';
+    const t = this._getTranslations(lang);
+    if (this.songName) this.songName.textContent = t.player_no_song || 'Chưa có nhạc';
+    if (this.artistName) this.artistName.textContent = t.player_user || 'Người dùng';
+    if (this.cover) this.cover.innerHTML = '<i class="fas fa-music"></i>';
+  }
+
+  _getTranslations(lang) {
+    const locales = {
+      vi: { player_no_song: 'Chưa có nhạc', player_user: 'Người dùng' },
+      en: { player_no_song: 'No song', player_user: 'User' }
+    };
+    return locales[lang] || locales.vi;
+  }
+
+  _bindEvents() {
     if (this.audio) {
       this.audio.addEventListener('loadedmetadata', () => {
         this.totalTime = this.audio.duration;
@@ -54,21 +70,11 @@ export class MusicPlayer {
       this.audio.addEventListener('error', (e) => { console.error('Lỗi phát nhạc:', e); });
     }
 
-    // Controls
     if (this.playBtn) this.playBtn.addEventListener('click', () => this.togglePlay());
     if (this.progressBar) this.progressBar.addEventListener('click', (e) => this.seek(e));
     if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.prev());
     if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.next());
     if (this.playlistToggle) this.playlistToggle.addEventListener('click', () => this.togglePlaylist());
-
-    this.renderPlaylist();
-    this.updatePlaylistCount();
-    this.updateDisplay();
-    const lang = localStorage.getItem('lang') || 'vi';
-    const t = translations[lang] || translations.vi;
-    if (this.songName) this.songName.textContent = t.player_no_song || 'Chưa có nhạc';
-    if (this.artistName) this.artistName.textContent = t.player_user || 'Người dùng';
-    if (this.cover) this.cover.innerHTML = '<i class="fas fa-music"></i>';
   }
 
   animateTransition(callback) {
@@ -96,7 +102,7 @@ export class MusicPlayer {
       song.src === src || (song.name.toLowerCase() === name.toLowerCase() && song.artist.toLowerCase() === artist.toLowerCase())
     );
     if (isDuplicate) {
-      alert(`Bài hát "${name}" - "${artist}" đã có trong danh sách. Không thêm trùng lặp.`);
+      showToast(`Bài hát "${name}" - "${artist}" đã có trong danh sách.`, 'error', 3000);
       return false;
     }
     this.playlist.push({ name, artist, src, img: img || '', fileName: fileName || '' });
@@ -114,7 +120,7 @@ export class MusicPlayer {
       if (this.songName) this.songName.textContent = song.name || 'Không tên';
       if (this.artistName) this.artistName.textContent = song.artist || 'Người dùng';
       if (this.cover) {
-        if (song.img) { this.cover.innerHTML = `<img src="${song.img}" alt="cover">`; } else { this.cover.innerHTML = `<i class="fas fa-music"></i>`; }
+        if (song.img) { this.cover.innerHTML = `<img src="${song.img}" alt="cover">`; } else { this.cover.innerHTML = '<i class="fas fa-music"></i>'; }
       }
       if (this.audio) {
         if (song.src) {
@@ -137,11 +143,11 @@ export class MusicPlayer {
 
   togglePlay() {
     if (this.currentIndex < 0 || this.playlist.length === 0) {
-      alert('Danh sách phát trống.');
+      showToast('Danh sách phát trống. Hãy thêm bài hát.', 'info', 3000);
       return;
     }
     const song = this.playlist[this.currentIndex];
-    if (!song.src) { alert('Bài hát chưa có file nhạc.'); return; }
+    if (!song.src) { showToast('Bài hát chưa có file nhạc.', 'error', 3000); return; }
     this.isPlaying = !this.isPlaying;
     if (this.isPlaying) {
       if (this.playIcon) this.playIcon.className = 'fas fa-pause';
@@ -273,7 +279,7 @@ export class MusicPlayer {
         this.isPlaying = false;
         if (this.playIcon) this.playIcon.className = 'fas fa-play';
         const lang = localStorage.getItem('lang') || 'vi';
-        const t = translations[lang] || translations.vi;
+        const t = this._getTranslations(lang);
         if (this.songName) this.songName.textContent = t.player_no_song || 'Chưa có nhạc';
         if (this.artistName) this.artistName.textContent = t.player_user || 'Người dùng';
         if (this.cover) this.cover.innerHTML = '<i class="fas fa-music"></i>';
@@ -290,14 +296,11 @@ export class MusicPlayer {
     this.playlistContainer.classList.toggle('open');
     const icon = this.playlistToggle.querySelector('i');
     if (icon) {
-      icon.className = this.playlistContainer.classList.contains('open') ?
-        'fas fa-chevron-up' : 'fas fa-list';
+      icon.className = this.playlistContainer.classList.contains('open') ? 'fas fa-chevron-up' : 'fas fa-list';
     }
   }
 
-  updatePlaylistCount() {
-    if (this.playlistCount) this.playlistCount.textContent = this.playlist.length;
-  }
+  updatePlaylistCount() { if (this.playlistCount) this.playlistCount.textContent = this.playlist.length; }
 
   updatePlaylistActive() {
     if (!this.playlistContainer) return;
