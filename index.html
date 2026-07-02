@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Thwih · Music</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <!-- CSS -->
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/themes.css" />
     <link rel="stylesheet" href="css/components.css" />
     <link rel="stylesheet" href="css/responsive.css" />
 </head>
 <body>
+
     <!-- Toast -->
     <div class="toast-container" id="toastContainer"></div>
 
@@ -66,7 +66,7 @@
         </div>
     </header>
 
-    <!-- Main content -->
+    <!-- Main Content -->
     <div class="main-content">
         <div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
 
@@ -89,7 +89,6 @@
 
         <!-- Card Menu -->
         <div class="card card-menu" id="menuCard">
-            <!-- Menu items -->
             <div class="menu-modern">
                 <a href="https://www.tiktok.com/@thwih1" class="menu-item" target="_blank">
                     <span class="icon-wrap"><i class="fab fa-tiktok"></i></span>
@@ -113,7 +112,7 @@
                 </a>
             </div>
 
-            <!-- Music section -->
+            <!-- Music -->
             <div class="music-section" id="musicSection">
                 <div class="section-title" data-i18n="music_title"><i class="fas fa-music"></i> Lấy Nhạc</div>
                 <div class="music-grid">
@@ -262,16 +261,12 @@
         </div>
     </div>
 
-    <!-- Welcome -->
+    <!-- ===== WELCOME (KHÔNG LOADING) ===== -->
     <div class="welcome-overlay" id="welcomeOverlay">
         <div class="galaxy-overlay"></div>
         <div class="welcome-box">
-            <div class="loading-state" id="loadingState">
-                <div class="spinner"></div>
-                <div class="load-title" data-i18n="welcome_loading">Đang tải ứng dụng</div>
-                <div class="load-sub"><span data-i18n="welcome_preparing">Chuẩn bị giao diện</span> <span class="dots">...</span> <span class="percent-display"><span class="num" id="loadPercent">0</span><span class="pct">%</span></span></div>
-            </div>
-            <div class="content-state" id="contentState">
+            <div class="loading-state" id="loadingState" style="display:none;"></div>
+            <div class="content-state" id="contentState" style="display:flex;">
                 <img class="shop-logo" src="assets/logo.png" alt="Thwih Logo" />
                 <h2 data-i18n="welcome_title">Chào mừng bạn đến với Thwih</h2>
                 <div class="shop-desc" data-i18n="welcome_desc"><strong>Nếu mọi người lấy Nhạc thì mọi người bấm</strong><br>vào các Liên Kết bên dưới để vào<br><strong>Group lấy nhạc nhé!</strong></div>
@@ -281,7 +276,7 @@
         </div>
     </div>
 
-    <!-- Import map & app entry -->
+    <!-- Scripts -->
     <script type="importmap">
         {
             "imports": {
@@ -290,5 +285,6 @@
         }
     </script>
     <script type="module" src="js/app.js"></script>
+
 </body>
 </html>
