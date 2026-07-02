@@ -1,1 +1,0 @@
-export const API_GATEWAY = 'https://thwihsite06.weylynofficial.workers.dev/';
