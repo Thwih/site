@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 150" width="400" height="150">
+  <defs>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00d2d3" />
+      <stop offset="50%" stop-color="#4a9eff" />
+      <stop offset="100%" stop-color="#6c5ce7" />
+    </linearGradient>
+  </defs>
+  <text x="200" y="95" font-family="Arial, sans-serif" font-size="70" font-weight="800" fill="url(#grad2)" text-anchor="middle">Thwih</text>
+  <text x="200" y="125" font-family="Arial, sans-serif" font-size="18" fill="#8aaac0" text-anchor="middle" letter-spacing="4">M U S I C</text>
+</svg>
