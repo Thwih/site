@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thwih · Music</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/themes.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Background -->
+    <div class="bg-container">
+        <div class="bg-gradient"></div>
+        <div class="bg-glow"></div><div class="bg-glow"></div><div class="bg-glow"></div>
+        <div class="particles">
+            <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+            <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        </div>
+        <div class="stars" id="starsContainer"></div>
+        <div class="shooting-star"></div><div class="shooting-star"></div><div class="shooting-star"></div>
+        <div class="shooting-star"></div><div class="shooting-star"></div><div class="shooting-star"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="brand">Thwih Music</span>
+            <button class="close-btn" id="sidebarClose"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sidebar-body">
+            <a href="#menuCard" class="sidebar-link" onclick="window.closeSidebar?.()"><i class="fas fa-home"></i> <span data-i18n="sidebar_home">Trang chủ</span></a>
+            <a href="#musicSection" class="sidebar-link" onclick="window.closeSidebar?.()"><i class="fas fa-music"></i> <span data-i18n="sidebar_music">Lấy nhạc miễn phí</span></a>
+            <a href="#searchSection" class="sidebar-link" onclick="window.closeSidebar?.()"><i class="fas fa-search"></i> <span data-i18n="sidebar_search">Tìm kiếm nhạc</span></a>
+            <a href="#tikSection" class="sidebar-link" onclick="window.closeSidebar?.()"><i class="fas fa-download"></i> <span data-i18n="sidebar_tiktok">Tải Video MP3, MP4</span></a>
+            <a href="#appleRentSection" class="sidebar-link" onclick="window.closeSidebar?.()"><i class="fab fa-apple"></i> <span data-i18n="sidebar_apple">Thuê ID Apple</span></a>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-subtitle" data-i18n="sidebar_connect">Kết nối</div>
+            <a href="https://www.tiktok.com/@thwih1" target="_blank" class="sidebar-link"><i class="fab fa-tiktok"></i> TikTok</a>
+            <a href="https://t.me/thwihmusic" target="_blank" class="sidebar-link"><i class="fab fa-telegram-plane"></i> Telegram</a>
+            <a href="https://zalo.me/g/otroe2pxpnitzfr6hppg" target="_blank" class="sidebar-link"><i class="fas fa-comment-dots"></i> Zalo Group</a>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-subtitle" data-i18n="sidebar_settings">Cài đặt</div>
+            <div class="sidebar-link" id="sidebarThemeToggle"><i class="fas fa-palette"></i> <span id="sidebarThemeText" data-i18n="sidebar_theme">Chế độ sáng/tối</span></div>
+            <div class="sidebar-link" onclick="window.toggleSidebarLanguage?.()"><i class="fas fa-globe"></i> <span id="sidebarLangText" data-i18n="sidebar_lang">Đổi ngôn ngữ (VI/EN)</span></div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></div>
+            <span class="header-brand">Thwih</span>
+        </div>
+        <div class="header-right">
+            <div class="header-bell" id="bellNotification"><i class="fas fa-bell"></i><span class="badge-dot" id="bellBadge">3</span></div>
+            <div class="header-theme" id="themeToggle"><i class="fas fa-sun" id="themeIcon"></i></div>
+            <div class="header-lang"><i class="fas fa-globe"></i><select id="langSelect"><option value="vi">VI</option><option value="en">EN</option></select></div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
+
+        <!-- Intro -->
+        <div class="card card-intro" id="introCard">
+            <div class="intro-wrapper">
+                <div class="avatar-wrapper">
+                    <div class="avatar-glow"></div>
+                    <div class="avatar-ring"></div>
+                    <div class="avatar"><img src="assets/avatar.jpg" alt="Thwih Avatar" /></div>
+                </div>
+                <div class="intro-text">
+                    <div class="line1" data-i18n="hi">Hi, i am</div>
+                    <div class="line2">Thwih <span class="verified-badge"><img src="assets/verified.png" alt="Verified" /></span></div>
+                    <div class="line3" data-i18n="tagline">and I'm a <span>Music Producer &amp; Developer</span></div>
+                </div>
+                <div class="slogan" data-i18n="slogan"><i class="fas fa-music"></i> Lấy nhạc miễn phí tại Thwih Music</div>
+            </div>
+        </div>
+
+        <!-- Card Menu -->
+        <div class="card card-menu" id="menuCard">
+            <!-- Menu items -->
+            <div class="menu-modern">
+                <a href="https://www.tiktok.com/@thwih1" class="menu-item" target="_blank">
+                    <span class="icon-wrap"><i class="fab fa-tiktok"></i></span>
+                    <span class="info"><span class="title" data-i18n="menu_follow_tiktok">Theo dõi TikTok</span><span class="desc"> @thwih1</span></span>
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+                </a>
+                <a href="https://t.me/thwihmusic" class="menu-item" target="_blank">
+                    <span class="icon-wrap"><i class="fab fa-telegram-plane"></i></span>
+                    <span class="info"><span class="title" data-i18n="menu_telegram">Telegram</span><span class="desc"> @thwihmusic</span></span>
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+                </a>
+                <a href="https://zalo.me/g/otroe2pxpnitzfr6hppg" class="menu-item" target="_blank">
+                    <span class="icon-wrap"><i class="fas fa-comment-dots"></i></span>
+                    <span class="info"><span class="title" data-i18n="menu_zalo">Zalo Group</span><span class="desc" data-i18n="menu_zalo_desc"> Cộng đồng âm nhạc</span></span>
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+                </a>
+                <a href="https://zalo.me/84338578255" class="menu-item" target="_blank">
+                    <span class="icon-wrap"><i class="fas fa-phone"></i></span>
+                    <span class="info"><span class="title" data-i18n="menu_contact">Liên hệ</span><span class="desc" data-i18n="menu_contact_desc"> Hợp tác &amp; hỗ trợ</span></span>
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+                </a>
+            </div>
+
+            <!-- Music section -->
+            <div class="music-section" id="musicSection">
+                <div class="section-title" data-i18n="music_title"><i class="fas fa-music"></i> Lấy Nhạc</div>
+                <div class="music-grid">
+                    <a href="https://docs.google.com/document/d/1-2uiAgYJKKeKJ3djo3oR80bp0HpJYesvgqT4yS-c85o/edit" target="_blank" class="music-card">
+                        <div class="left"><span class="icon-box"><i class="fas fa-music"></i></span><span class="info"><span class="name" data-i18n="free_music">Get Music 2026</span><span class="desc"><i class="fas fa-calendar-alt"></i> <span data-i18n="music_updated">Cập nhật liên tục</span> <i class="fas fa-download" style="margin-left:8px;"></i> <span data-i18n="music_free">Tải miễn phí</span></span></span></div>
+                        <div class="right"><span class="badge">Google Docs</span><span class="arrow"><i class="fas fa-chevron-right"></i></span></div>
+                    </a>
+                    <a href="https://docs.google.com/document/d/1-2uiAgYJKKeKJ3djo3oR80bp0HpJYesvgqT4yS-c85o/edit" target="_blank" class="music-card">
+                        <div class="left"><span class="icon-box"><i class="fas fa-headphones"></i></span><span class="info"><span class="name" data-i18n="library">Thư viện nhạc</span><span class="desc"><i class="fas fa-list-ul"></i> <span data-i18n="library_diverse">Đa dạng thể loại</span> <i class="fas fa-infinity" style="margin-left:8px;"></i> <span data-i18n="library_unlimited">Không giới hạn</span></span></span></div>
+                        <div class="right"><span class="badge" data-i18n="badge_list">Danh sách</span><span class="arrow"><i class="fas fa-chevron-right"></i></span></div>
+                    </a>
+                </div>
+
+                <!-- Search -->
+                <div class="music-search-section" id="searchSection">
+                    <div class="section-title" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <i class="fas fa-search"></i><span data-i18n="search_title">Tìm kiếm &amp; chọn nhạc</span>
+                        <button id="refreshSongsBtn" style="margin-left:auto;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:40px;padding:0.3rem 1rem;color:var(--text-muted);cursor:pointer;transition:all 0.3s;font-size:0.8rem;display:flex;align-items:center;gap:6px;"><i class="fas fa-sync-alt"></i> <span data-i18n="refresh_btn">Làm mới</span></button>
+                    </div>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" data-i18n-placeholder="search_placeholder" placeholder="Nhập tên bài hát..." />
+                        <button class="clear-btn" id="clearSearch"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="song-count" id="songCountDisplay">Đang tải...</div>
+                    <div class="link-speed-note"><i class="fas fa-clock"></i><span><strong>Thwih Thông Báo:</strong> Tạo Link có thể mất vài Giây!</span></div>
+                    <div class="song-list" id="songList"></div>
+                </div>
+            </div>
+
+            <!-- Player -->
+            <div class="player-wrapper" id="playerWrapper">
+                <div class="player-top">
+                    <div class="player-cover" id="playerCover"><i class="fas fa-music"></i></div>
+                    <div class="player-info">
+                        <div class="song-name" id="playerSongName" data-i18n="player_no_song">Chưa có nhạc</div>
+                        <div class="artist-name" id="playerArtistName" data-i18n="player_user">Người dùng</div>
+                    </div>
+                    <div class="player-controls">
+                        <button id="prevBtn"><i class="fas fa-step-backward"></i></button>
+                        <button class="play-btn" id="playBtn"><i class="fas fa-play" id="playIcon"></i></button>
+                        <button id="nextBtn"><i class="fas fa-step-forward"></i></button>
+                    </div>
+                </div>
+                <div class="player-progress-area">
+                    <span class="time" id="currentTime">0:00</span>
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill" id="playerProgressFill"></div>
+                        <div class="progress-dot" id="progressDot"></div>
+                    </div>
+                    <span class="time" id="totalTime">-0:00</span>
+                </div>
+                <div class="player-bottom">
+                    <button class="playlist-toggle" id="playlistToggle"><i class="fas fa-list"></i> <span data-i18n="playlist_label">Danh sách</span> <span class="badge" id="playlistCount">0</span></button>
+                </div>
+                <div class="playlist-container" id="playlistContainer"></div>
+            </div>
+
+            <!-- TikTok -->
+            <div class="tik-section" id="tikSection">
+                <div class="section-title"><i class="fas fa-download"></i> <span data-i18n="tiktok_title">Tải Video MP3, MP4</span></div>
+                <div class="tik-downloader-box">
+                    <div class="tik-mode-toggle">
+                        <button class="active" data-mode="single" id="tikModeSingle"><i class="fas fa-link"></i> <span data-i18n="tiktok_single">1 Link</span></button>
+                        <button data-mode="batch" id="tikModeBatch"><i class="fas fa-layer-group"></i> <span data-i18n="tiktok_batch">Nhiều link</span></button>
+                    </div>
+                    <div class="tik-input-group">
+                        <input type="text" id="tikUrlInput" data-i18n-placeholder="tiktok_input_placeholder" placeholder="Dán link TikTok..." />
+                        <textarea id="tikBatchInput" data-i18n-placeholder="tiktok_batch_placeholder" placeholder="Mỗi link 1 dòng..."></textarea>
+                        <button class="tik-btn-download" id="tikFetchBtn"><i class="fas fa-cloud-download-alt"></i> <span data-i18n="tiktok_download_btn">Tải xuống</span></button>
+                    </div>
+                    <div class="tik-options-compact">
+                        <label class="opt-item"><input type="checkbox" id="tikMp4" checked><i class="fas fa-video"></i> <span data-i18n="tiktok_mp4">MP4</span></label>
+                        <label class="opt-item"><input type="checkbox" id="tikMp3"><i class="fas fa-music"></i> <span data-i18n="tiktok_mp3">MP3</span></label>
+                        <label class="opt-item"><input type="checkbox" id="tikNoWatermark" checked><i class="fas fa-water"></i> <span data-i18n="tiktok_nowm">No WM</span></label>
+                    </div>
+                    <div class="tik-download-note"><i class="fas fa-check-circle"></i> <span data-i18n="tiktok_note">Có thể tải xuống cả MP3 &amp; MP4</span></div>
+                    <div class="tik-progress-wrap" id="tikProgressWrap">
+                        <div class="tik-progress-bar"><div class="tik-progress-fill" id="tikProgressFill"></div></div>
+                        <div class="tik-progress-text"><span id="tikProgressLabel" data-i18n="tiktok_loading">Đang tải...</span><span class="tik-percent" id="tikPercentLabel">0%</span></div>
+                    </div>
+                    <div class="tik-batch-status" id="tikBatchStatus"></div>
+                    <div class="tik-batch-summary" id="tikBatchSummary"></div>
+                    <div class="tik-api-status">
+                        <span class="api-dot"></span>
+                        <span class="api-label">API:</span>
+                        <span class="api-name" id="apiEndpointDisplay">Gateway</span>
+                        <span class="api-arrow">•</span>
+                        <span class="api-badge">Thwih</span>
+                    </div>
+                    <div class="tik-error" id="tikError"></div>
+                    <div class="tik-result" id="tikResult">
+                        <div class="tik-thumb" id="tikThumb"></div>
+                        <div class="tik-info"><div class="tik-title" id="tikTitle"></div><div class="tik-author" id="tikAuthor"></div></div>
+                        <div class="tik-actions" id="tikActions"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apple Rent -->
+            <div class="apple-rent-section" id="appleRentSection">
+                <div class="section-title"><i class="fab fa-apple"></i> <span data-i18n="apple_title">Thuê ID Apple – Tải FL Studio</span></div>
+                <div class="apple-rent-card">
+                    <div class="apple-rent-header">
+                        <div class="app-icon"><i class="fab fa-apple"></i></div>
+                        <div class="app-info"><h3>FL Studio Mobile</h3><div class="app-dev">Image Line Software</div></div>
+                    </div>
+                    <div class="apple-rent-body">
+                        <div class="rent-item"><div class="label" data-i18n="apple_price_label">Giá thuê</div><div class="value price">15.000đ</div></div>
+                        <div class="rent-item"><div class="label" data-i18n="apple_device_label">Thiết bị</div><div class="value" data-i18n="apple_device_value">iPhone / iPad</div></div>
+                    </div>
+                    <div class="apple-rent-note"><i class="fas fa-info-circle"></i> <span data-i18n="apple_note">Nhận ID Apple ngay sau thanh toán. Hỗ trợ đăng nhập và tải ứng dụng.</span></div>
+                    <div class="apple-rent-footer">
+                        <a href="https://zalo.me/84338578255" target="_blank" class="btn-rent"><i class="fas fa-comment-dots"></i> <span data-i18n="apple_contact_zalo">Liên hệ Zalo</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom -->
+        <div class="bottom-group">
+            <div class="time-widget"><i class="fas fa-clock"></i><span class="time-display" id="clockDisplay">00:00:00</span><span class="time-label" data-i18n="current_time">Giờ hiện tại</span></div>
+            <div class="footer" data-i18n="footer"><i class="fas fa-code"></i> Designed by <a href="#">Thwih</a> &bull; 2026 &nbsp;&nbsp;|&nbsp;&nbsp; <i class="fas fa-globe"></i> thwih.com</div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <h3 data-i18n="notification_title">Thông Báo</h3>
+            <p data-i18n="notification_content">Nếu mọi người lấy Nhạc thì mọi người bấm vào các Liên Kết bên dưới để vào Group lấy nhạc.</p>
+            <button class="btn-close-modal" id="closeModalBtn" data-i18n="understood">Đã hiểu</button>
+        </div>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat-widget" id="chatWidget">
+        <button class="chat-toggle" id="chatToggle"><i class="fas fa-comment-dots"></i></button>
+        <div class="chat-box" id="chatBox">
+            <div class="chat-header"><span><i class="fas fa-robot"></i> <span data-i18n="ai_assistant">AI Assistant</span></span><button class="chat-close" id="chatClose"><i class="fas fa-times"></i></button></div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" data-i18n-placeholder="chat_placeholder" placeholder="Nhập tin nhắn..." />
+                <button id="chatSend"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome -->
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <div class="galaxy-overlay"></div>
+        <div class="welcome-box">
+            <div class="loading-state" id="loadingState">
+                <div class="spinner"></div>
+                <div class="load-title" data-i18n="welcome_loading">Đang tải ứng dụng</div>
+                <div class="load-sub"><span data-i18n="welcome_preparing">Chuẩn bị giao diện</span> <span class="dots">...</span> <span class="percent-display"><span class="num" id="loadPercent">0</span><span class="pct">%</span></span></div>
+            </div>
+            <div class="content-state" id="contentState">
+                <img class="shop-logo" src="assets/logo.png" alt="Thwih Logo" />
+                <h2 data-i18n="welcome_title">Chào mừng bạn đến với Thwih</h2>
+                <div class="shop-desc" data-i18n="welcome_desc"><strong>Nếu mọi người lấy Nhạc thì mọi người bấm</strong><br>vào các Liên Kết bên dưới để vào<br><strong>Group lấy nhạc nhé!</strong></div>
+                <button class="btn-start" id="welcomeBtn"><i class="fas fa-check-circle"></i> <span data-i18n="welcome_btn">Đã Hiểu</span></button>
+                <button class="close-noti" id="closeNotiBtn" data-i18n="welcome_close">Tắt Thông Báo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import map & app entry -->
+    <script type="importmap">
+        {
+            "imports": {
+                "./js/": "./js/"
+            }
+        }
+    </script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
