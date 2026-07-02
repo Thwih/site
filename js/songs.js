@@ -1,70 +1,48 @@
 import { API_GATEWAY } from './config.js';
 import { showToast, escapeHtml, truncateName } from './utils.js';
-import { shortenThrice, createProgressPage } from './shorten.js';
 
 let songData = [];
 let songMap = new Map();
 let isFetching = false;
-let isProcessing = false;
 
 export async function fetchSongsFromDrive(showToastOnChange = true) {
-    // ... (giữ nguyên)
-}
-
-function renderSongs(filter = '') {
-    // ... (giữ nguyên)
-}
-
-async function handleSongClick(originalLink, element) {
-    if (isProcessing || !originalLink) return;
-    isProcessing = true;
-
-    const nameEl = element.querySelector('.name');
-    const originalText = nameEl.textContent;
-    const downloadBtn = element.querySelector('.download-btn');
-
-    element.style.pointerEvents = 'none';
-    if (downloadBtn) downloadBtn.style.pointerEvents = 'none';
-
-    nameEl.innerHTML = `<span class="spinner-icon"><i class="fas fa-spinner"></i></span> Đang Tạo Link...`;
-    nameEl.classList.add('loading');
-
-    const newTab = createProgressPage('Đang tạo link...');
-
+    if (isFetching) return;
+    isFetching = true;
     try {
-        const finalLink = await shortenThrice(originalLink);
-        let progress = 0;
-        const interval = setInterval(() => {
-            if (newTab && !newTab.closed) {
-                if (progress < 90) { progress += Math.random() * 5 + 2; if (progress > 90) progress = 90;
-                    newTab.updateProgress(progress); }
+        console.log('🔍 Đang gọi API:', `${API_GATEWAY}?action=drive`);
+        const response = await fetch(`${API_GATEWAY}?action=drive`);
+        console.log('📡 Response status:', response.status);
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || `HTTP ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('📦 Dữ liệu nhận được:', data);
+        if (!data.success) throw new Error(data.error || 'Worker error');
+        if (!data.data || !Array.isArray(data.data.files)) {
+            throw new Error('Invalid response format');
+        }
+        songMap.clear();
+        data.data.files.forEach(file => {
+            if (file.id && file.name && file.link) {
+                songMap.set(file.id, { id: file.id, name: file.name, link: file.link });
             }
-        }, 300);
-        setTimeout(() => {
-            clearInterval(interval);
-            if (newTab && !newTab.closed) {
-                newTab.updateProgress(100);
-                setTimeout(() => { if (!newTab.closed) newTab.location.href = finalLink; }, 500);
-            } else {
-                window.open(finalLink, '_blank');
-            }
-            showToast('Đã mở tab với link rút gọn!', 'success', 3000);
-        }, 3000);
+        });
+        songData = Array.from(songMap.values());
+        renderSongs('');
+        const countEl = document.getElementById('songCountDisplay');
+        if (countEl) countEl.textContent = `${songData.length} bài hát`;
+        if (showToastOnChange) {
+            showToast(`Đã cập nhật ${songData.length} bài hát!`, 'success', 3000);
+        }
     } catch (error) {
-        console.error(error);
-        showToast('❌ Lỗi, vui lòng thử lại!', 'error', 4000);
-        if (newTab && !newTab.closed) newTab.close();
+        console.error('❌ Lỗi lấy danh sách nhạc:', error);
+        if (showToastOnChange) {
+            showToast('❌ Không thể tải danh sách nhạc. Vui lòng thử lại.', 'error', 5000);
+        }
     } finally {
-        setTimeout(() => {
-            nameEl.textContent = originalText;
-            nameEl.classList.remove('loading');
-            element.style.pointerEvents = '';
-            if (downloadBtn) downloadBtn.style.pointerEvents = '';
-            isProcessing = false;
-        }, 3000);
+        isFetching = false;
     }
 }
 
-export function initSongs() {
-    // ... (giữ nguyên sự kiện tìm kiếm, làm mới)
-}
+// ... các hàm renderSongs, handleSongClick (giữ nguyên)
