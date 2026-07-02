@@ -112,7 +112,7 @@ export function createProgressPage(title = 'Đang tạo link...') {
                     if(pct<=33) stepLabel.innerHTML='🔹 <span class="highlight">Lần 1:</span> Đang rút gọn...';
                     else if(pct<=66) stepLabel.innerHTML='🔸 <span class="highlight">Lần 2:</span> Đang rút gọn...';
                     else if(pct<100) stepLabel.innerHTML='🔹 <span class="highlight">Lần 3:</span> Đang rút gọn...';
-                    else stepLabel.innerHTML=' ✅ <span class="highlight">Hoàn tất!</span> Chuyển hướng...';
+                    else stepLabel.innerHTML=' <span class="highlight">Hoàn tất!</span> Chuyển hướng...';
                 }
             };
         <\/script>
