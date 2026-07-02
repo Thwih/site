@@ -1,3 +1,6 @@
+// ===== js/ui.js =====
+// SỬA ĐÚNG IMPORT
+import { API_GATEWAY, TRANSLATIONS } from './config.js';
 import { showToast } from './utils.js';
 import { applyLanguage, getLang, setLang } from './i18n.js';
 
@@ -182,7 +185,7 @@ export function initUI() {
   };
 
   async function getSmartReply(msg) {
-    // Dùng API DeepSeek nếu có, fallback cơ bản
+    // SỬ DỤNG API_GATEWAY ĐÃ IMPORT
     try {
       const resp = await fetch(`${API_GATEWAY}?action=deepseek`, {
         method: 'POST',
@@ -199,9 +202,11 @@ export function initUI() {
         return json.data.choices[0].message.content;
       }
     } catch (e) { console.warn('DeepSeek fallback:', e); }
-    // Fallback đơn giản
+    // Fallback sử dụng TRANSLATIONS đã import
+    const lang = getLang();
+    const t = TRANSLATIONS[lang] || TRANSLATIONS.vi;
     const lower = msg.toLowerCase();
-    if (lower.includes('chào') || lower.includes('hi')) return 'Xin chào! Tôi là AI của Thwih Music. Bạn cần gì? 🎵';
+    if (lower.includes('chào') || lower.includes('hi')) return t.ai_welcome || 'Xin chào! Tôi là AI của Thwih Music.';
     if (lower.includes('nhạc') || lower.includes('music')) return 'Bạn có thể tìm nhạc trong danh sách hoặc tải từ TikTok.';
     if (lower.includes('cảm ơn')) return 'Không có gì! Tôi luôn sẵn sàng giúp đỡ.';
     return 'Tôi chưa hiểu câu hỏi. Bạn có thể hỏi về âm nhạc, lập trình, hoặc kết nối mạng xã hội.';
@@ -214,7 +219,7 @@ export function initUI() {
         chatInput.focus();
         if (isFirstOpen) {
           const lang = getLang();
-          const t = translations[lang] || translations.vi;
+          const t = TRANSLATIONS[lang] || TRANSLATIONS.vi;
           setTimeout(() => window.appendMessage('bot', t.ai_welcome || 'Xin chào!'), 400);
           isFirstOpen = false;
         }
@@ -227,24 +232,23 @@ export function initUI() {
       if (!text) return;
       window.appendMessage('user', text);
       chatInput.value = '';
-      const typingId = { div: null, interval: null };
       const typingDiv = document.createElement('div');
       typingDiv.className = 'message bot typing';
       typingDiv.innerHTML = `<span class="avatar"><i class="fas fa-robot"></i></span><div class="bubble" style="min-width:60px;"><span class="typing-dots">.</span></div>`;
       chatMessages.appendChild(typingDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
       let dots = 0;
-      typingId.interval = setInterval(() => {
+      const interval = setInterval(() => {
         const span = typingDiv.querySelector('.typing-dots');
         if (span) { dots = (dots % 3) + 1; span.textContent = '.'.repeat(dots); }
       }, 400);
       try {
         const reply = await getSmartReply(text);
-        clearInterval(typingId.interval);
+        clearInterval(interval);
         typingDiv.remove();
         window.appendMessage('bot', reply);
       } catch (e) {
-        clearInterval(typingId.interval);
+        clearInterval(interval);
         typingDiv.remove();
         window.appendMessage('bot', '❌ Lỗi, vui lòng thử lại.');
       }
@@ -252,4 +256,13 @@ export function initUI() {
     chatSend.addEventListener('click', sendChat);
     chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat(); });
   }
+
+  // FORCE UNLOCK: nếu welcome không tự chuyển sau 6s
+  setTimeout(() => {
+    const overlay = document.getElementById('welcomeOverlay');
+    if (overlay && !overlay.classList.contains('hidden')) {
+      overlay.classList.add('hidden');
+      console.warn('⚠️ Welcome overlay force-closed after timeout (ui.js)');
+    }
+  }, 8000);
 }
