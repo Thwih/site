@@ -26,9 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initSidebar();
     initChat();
     initWelcome();
-    initSongs();
+    initSongs();  // <-- Gọi initSongs để fetch
     window.player = new MusicPlayer();
     initTikTok();
     // Back to top, modal...
-    console.log('✅ Ứng dụng đã sẵn sàng.');
+    console.log('Ứng dụng đã sẵn sàng.');
 });
