@@ -1,5 +1,4 @@
 // ===== js/ui.js =====
-// SỬA ĐÚNG IMPORT
 import { API_GATEWAY, TRANSLATIONS } from './config.js';
 import { showToast } from './utils.js';
 import { applyLanguage, getLang, setLang } from './i18n.js';
@@ -120,6 +119,19 @@ export function initUI() {
     }
   }
 
+  // Welcome overlay – hiển thị ngay, không loading
+  const welcomeOverlay = document.getElementById('welcomeOverlay');
+  const welcomeBtn = document.getElementById('welcomeBtn');
+  const closeNotiBtn = document.getElementById('closeNotiBtn');
+  if (welcomeOverlay && welcomeBtn && closeNotiBtn) {
+    const closeWelcome = () => welcomeOverlay.classList.add('hidden');
+    welcomeBtn.addEventListener('click', closeWelcome);
+    closeNotiBtn.addEventListener('click', closeWelcome);
+    welcomeOverlay.addEventListener('click', (e) => {
+      if (e.target === welcomeOverlay) closeWelcome();
+    });
+  }
+
   // Chat
   const chatToggle = document.getElementById('chatToggle');
   const chatBox = document.getElementById('chatBox');
@@ -150,7 +162,6 @@ export function initUI() {
   };
 
   async function getSmartReply(msg) {
-    // SỬ DỤNG API_GATEWAY ĐÃ IMPORT
     try {
       const resp = await fetch(`${API_GATEWAY}?action=deepseek`, {
         method: 'POST',
@@ -167,7 +178,6 @@ export function initUI() {
         return json.data.choices[0].message.content;
       }
     } catch (e) { console.warn('DeepSeek fallback:', e); }
-    // Fallback sử dụng TRANSLATIONS đã import
     const lang = getLang();
     const t = TRANSLATIONS[lang] || TRANSLATIONS.vi;
     const lower = msg.toLowerCase();
@@ -221,13 +231,4 @@ export function initUI() {
     chatSend.addEventListener('click', sendChat);
     chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat(); });
   }
-
-  // FORCE UNLOCK: nếu welcome không tự chuyển sau 6s
-  setTimeout(() => {
-    const overlay = document.getElementById('welcomeOverlay');
-    if (overlay && !overlay.classList.contains('hidden')) {
-      overlay.classList.add('hidden');
-      console.warn('⚠️ Welcome overlay force-closed after timeout (ui.js)');
-    }
-  }, 8000);
 }
