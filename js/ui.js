@@ -120,41 +120,6 @@ export function initUI() {
     }
   }
 
-  // Welcome overlay
-  const welcomeOverlay = document.getElementById('welcomeOverlay');
-  const loadingState = document.getElementById('loadingState');
-  const contentState = document.getElementById('contentState');
-  const loadPercent = document.getElementById('loadPercent');
-  const welcomeBtn = document.getElementById('welcomeBtn');
-  const closeNotiBtn = document.getElementById('closeNotiBtn');
-  if (welcomeOverlay && loadingState && contentState && loadPercent && welcomeBtn && closeNotiBtn) {
-    let percent = 0;
-    const loadInterval = setInterval(() => {
-      percent += Math.floor(Math.random() * 6) + 2;
-      if (percent > 100) percent = 100;
-      loadPercent.textContent = percent;
-      if (percent === 100) {
-        clearInterval(loadInterval);
-        setTimeout(() => {
-          loadingState.style.display = 'none';
-          contentState.style.display = 'flex';
-        }, 400);
-      }
-    }, 80);
-    setTimeout(() => {
-      if (percent < 100) {
-        clearInterval(loadInterval);
-        loadPercent.textContent = '100';
-        loadingState.style.display = 'none';
-        contentState.style.display = 'flex';
-      }
-    }, 6000);
-    const closeWelcome = () => welcomeOverlay.classList.add('hidden');
-    welcomeBtn.addEventListener('click', closeWelcome);
-    closeNotiBtn.addEventListener('click', closeWelcome);
-    welcomeOverlay.addEventListener('click', (e) => { if (e.target === welcomeOverlay) closeWelcome(); });
-  }
-
   // Chat
   const chatToggle = document.getElementById('chatToggle');
   const chatBox = document.getElementById('chatBox');
