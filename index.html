@@ -8,30 +8,20 @@
   <link rel="stylesheet" href="/src/styles/main.css" />
 </head>
 <body>
-  <!-- ===== TOAST CONTAINER ===== -->
+  <!-- ===== TOAST ===== -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- ===== NỀN ĐỘNG ===== -->
+  <!-- ===== BG ===== -->
   <div class="bg-container">
     <div class="bg-gradient"></div>
-    <div class="bg-glow"></div>
-    <div class="bg-glow"></div>
-    <div class="bg-glow"></div>
+    <div class="bg-glow"></div><div class="bg-glow"></div><div class="bg-glow"></div>
     <div class="particles">
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
+      <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+      <div class="particle"></div><div class="particle"></div><div class="particle"></div>
     </div>
     <div class="stars" id="starsContainer"></div>
-    <div class="shooting-star"></div>
-    <div class="shooting-star"></div>
-    <div class="shooting-star"></div>
-    <div class="shooting-star"></div>
-    <div class="shooting-star"></div>
-    <div class="shooting-star"></div>
+    <div class="shooting-star"></div><div class="shooting-star"></div><div class="shooting-star"></div>
+    <div class="shooting-star"></div><div class="shooting-star"></div><div class="shooting-star"></div>
   </div>
 
   <!-- ===== SIDEBAR ===== -->
@@ -54,6 +44,7 @@
       <a href="https://zalo.me/g/otroe2pxpnitzfr6hppg" target="_blank" class="sidebar-link"><i class="fas fa-comment-dots"></i> Zalo Group</a>
       <div class="sidebar-divider"></div>
       <div class="sidebar-subtitle" data-i18n="sidebar_support">Hỗ trợ</div>
+      <a href="javascript:void(0)" class="sidebar-link" onclick="openSubmitMusicModal()"><i class="fas fa-paper-plane"></i> <span data-i18n="sidebar_submit">Gửi nhạc cho admin</span></a>
       <div class="sidebar-divider"></div>
       <div class="sidebar-subtitle" data-i18n="sidebar_settings">Cài đặt</div>
       <div class="sidebar-link" id="sidebarThemeToggle"><i class="fas fa-palette"></i> <span id="sidebarThemeText" data-i18n="sidebar_theme">Chế độ sáng/tối</span></div>
@@ -77,7 +68,7 @@
   <div class="main-content">
     <div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
 
-    <!-- ===== INTRO ===== -->
+    <!-- INTRO -->
     <div class="card card-intro" id="introCard">
       <div class="intro-wrapper">
         <div class="avatar-wrapper">
@@ -94,7 +85,7 @@
       </div>
     </div>
 
-    <!-- ===== CARD MENU ===== -->
+    <!-- CARD MENU -->
     <div class="card card-menu" id="menuCard">
       <div class="menu-modern">
         <a href="https://www.tiktok.com/@thwih1?_r=1&_t=ZS-97L57Bghcx6" class="menu-item" target="_blank">
@@ -119,7 +110,7 @@
         </a>
       </div>
 
-      <!-- ===== LẤY NHẠC ===== -->
+      <!-- MUSIC -->
       <div class="music-section" id="musicSection">
         <div class="section-title" data-i18n="music_title"><i class="fas fa-music"></i> Lấy Nhạc</div>
         <div class="music-grid">
@@ -133,12 +124,12 @@
           </a>
         </div>
 
-        <!-- ===== TÌM KIẾM & CHỌN NHẠC ===== -->
+        <!-- SEARCH -->
         <div class="music-search-section" id="searchSection">
           <div class="section-title" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
             <i class="fas fa-search"></i>
             <span data-i18n="search_title">Tìm kiếm &amp; chọn nhạc</span>
-            <button id="refreshSongsBtn" style="margin-left:auto;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:40px;padding:0.3rem 1rem;color:var(--text-muted);cursor:pointer;transition:background 0.3s, color 0.3s, transform 0.2s;font-size:0.8rem;display:flex;align-items:center;gap:6px;will-change:transform;">
+            <button id="refreshSongsBtn" style="margin-left:auto;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:40px;padding:0.3rem 1rem;color:var(--text-muted);cursor:pointer;transition:all 0.3s;font-size:0.8rem;display:flex;align-items:center;gap:6px;">
               <i class="fas fa-sync-alt"></i> <span data-i18n="refresh_btn">Làm mới</span>
             </button>
           </div>
@@ -150,13 +141,13 @@
           <div class="song-count" id="songCountDisplay">Đang tải...</div>
           <div class="link-speed-note" id="linkSpeedNote">
             <i class="fas fa-clock"></i>
-            <span><strong>Thwih Thông Báo:</strong> Click vào tên bài hát để tạo link rút gọn (mất vài giây)!</span>
+            <span><strong>Thwih Thông Báo:</strong> Tạo Link có thể mất vài Giây!</span>
           </div>
           <div class="song-list" id="songList"></div>
         </div>
       </div>
 
-      <!-- ===== PLAYER ===== -->
+      <!-- PLAYER -->
       <div class="player-wrapper" id="playerWrapper">
         <div class="player-top">
           <div class="player-cover" id="playerCover"><i class="fas fa-music"></i></div>
@@ -179,14 +170,15 @@
           <span class="time" id="totalTime">-0:00</span>
         </div>
         <div class="player-bottom">
-          <div class="player-extra-controls"></div>
+          <div class="player-extra-controls"><button id="uploadBtn" data-i18n="upload_btn"><i class="fas fa-upload"></i> Tải lên</button></div>
           <button class="playlist-toggle" id="playlistToggle"><i class="fas fa-list"></i> <span data-i18n="playlist_label">Danh sách</span> <span class="badge" id="playlistCount">0</span></button>
         </div>
         <div class="playlist-container" id="playlistContainer"></div>
+        <div class="upload-status hidden" id="uploadStatus"><i class="fas fa-check-circle"></i> <span id="uploadFileName"></span></div>
         <input type="file" id="fileInput" accept=".mp3,.wav" style="display:none;" />
       </div>
 
-      <!-- ===== TIKTOK DOWNLOADER ===== -->
+      <!-- TIKTOK -->
       <div class="tik-section" id="tikSection">
         <div class="section-title"><i class="fas fa-download"></i> <span data-i18n="tiktok_title">Tải Video MP3, MP4</span></div>
         <div class="tik-downloader-box">
@@ -227,7 +219,7 @@
         </div>
       </div>
 
-      <!-- ===== APPLE RENT ===== -->
+      <!-- APPLE -->
       <div class="apple-rent-section" id="appleRentSection">
         <div class="section-title"><i class="fab fa-apple"></i> <span data-i18n="apple_title">Thuê ID Apple – Tải FL Studio</span></div>
         <div class="apple-rent-card">
@@ -247,14 +239,14 @@
       </div>
     </div>
 
-    <!-- ===== BOTTOM ===== -->
+    <!-- BOTTOM -->
     <div class="bottom-group">
       <div class="time-widget"><i class="fas fa-clock"></i><span class="time-display" id="clockDisplay">00:00:00</span><span class="time-label" data-i18n="current_time">Giờ hiện tại</span></div>
       <div class="footer" data-i18n="footer"><i class="fas fa-code"></i> Designed by <a href="#">Thwih</a> &bull; 2026 &nbsp;&nbsp;|&nbsp;&nbsp; <i class="fas fa-globe"></i> thwih.com</div>
     </div>
   </div>
 
-  <!-- ===== MODAL ===== -->
+  <!-- MODALS -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal-box">
       <h3 data-i18n="notification_title">Thông Báo</h3>
@@ -263,7 +255,31 @@
     </div>
   </div>
 
-  <!-- ===== CHAT ===== -->
+  <div class="music-modal" id="submitMusicModal">
+    <div class="ticket-box">
+      <h3><i class="fas fa-envelope-open-text"></i> <span data-i18n="submit_modal_title">Gửi yêu cầu nhạc</span></h3>
+      <p class="sub" data-i18n="submit_modal_sub">Vui lòng điền thông tin, admin sẽ phản hồi qua Email.</p>
+      <form id="submitMusicForm" action="https://formsubmit.co/adminthwih06@gmail.com" method="POST">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="box">
+        <input type="hidden" name="_subject" value="Yêu cầu nhạc mới từ Thwih Music">
+        <label data-i18n="submit_song_label">Tên bài hát</label>
+        <input type="text" name="Tên bài hát" id="musicName" data-i18n-placeholder="submit_song_placeholder" placeholder="Nhập tên bài hát..." required />
+        <label data-i18n="submit_artist_label">Tên nghệ sĩ / Nhóm nhạc</label>
+        <input type="text" name="Nghệ sĩ" id="musicArtist" data-i18n-placeholder="submit_artist_placeholder" placeholder="Tên nghệ sĩ..." required />
+        <label data-i18n="submit_link_label">Link tải nhạc (Google Drive / Mediafire ...)</label>
+        <input type="url" name="Link tải nhạc" id="musicLink" data-i18n-placeholder="submit_link_placeholder" placeholder="Link tải nhạc trực tiếp..." required />
+        <label data-i18n="submit_email_label">Email liên hệ của bạn</label>
+        <input type="email" name="Email" id="musicEmail" data-i18n-placeholder="submit_email_placeholder" placeholder="Email nhận phản hồi..." required />
+        <div class="btn-group">
+          <button type="button" class="btn-cancel" id="submitMusicCancel" data-i18n="cancel">Hủy</button>
+          <button type="submit" class="btn-submit" id="submitMusicSubmit" data-i18n="submit_btn">Gửi yêu cầu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CHAT -->
   <div class="chat-widget" id="chatWidget">
     <button class="chat-toggle" id="chatToggle"><i class="fas fa-comment-dots"></i></button>
     <div class="chat-box" id="chatBox">
@@ -276,7 +292,7 @@
     </div>
   </div>
 
-  <!-- ===== WELCOME ===== -->
+  <!-- WELCOME -->
   <div class="welcome-overlay" id="welcomeOverlay">
     <div class="galaxy-overlay"></div>
     <div class="welcome-box">
@@ -295,7 +311,6 @@
     </div>
   </div>
 
-  <!-- ===== ENTRY POINT ===== -->
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
