@@ -1,9 +1,7 @@
-// Import styles
 import './styles/main.css';
 import './styles/components.css';
 import './styles/themes.css';
 
-// Import các component
 import { renderHeader } from './components/header.js';
 import { renderSidebar } from './components/sidebar.js';
 import { renderIntro } from './components/intro.js';
@@ -17,80 +15,40 @@ import { renderChat } from './components/chat.js';
 import { renderWelcome } from './components/welcome.js';
 import { renderModal } from './components/modal.js';
 
-// Import các module khác
-import { initI18n } from './i18n.js';
+import { initI18n, loadLanguage } from './i18n.js';
 import { MusicPlayer } from './player.js';
 import { initTikTok } from './tiktok.js';
-import { fetchSongs } from './api.js';
-import { showToast } from './utils.js';
+import { fetchSongs, shortenThrice } from './api.js';
+import { showToast, escapeHtml, truncateName, formatTime } from './utils.js';
 
-// Hàm render toàn bộ ứng dụng
-function renderApp() {
-  const app = document.getElementById('app');
-  if (!app) return;
-
-  app.innerHTML = `
-    <!-- Sidebar (toàn cục) -->
-    ${renderSidebar()}
-    
-    <!-- Header -->
-    ${renderHeader()}
-    
-    <!-- Back to Top -->
-    <div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
-
-    <!-- Intro -->
-    ${renderIntro()}
-
-    <!-- Card Menu (chứa menu, music, player, tiktok, apple) -->
-    <div class="card card-menu" id="menuCard">
-      ${renderMenu()}
-      ${renderMusic()}
-      ${renderPlayer()}
-      ${renderTikTok()}
-      ${renderApple()}
-    </div>
-
-    <!-- Bottom -->
-    ${renderBottom()}
-
-    <!-- Modal -->
-    ${renderModal()}
-
-    <!-- Chat -->
-    ${renderChat()}
-
-    <!-- Welcome -->
-    ${renderWelcome()}
-  `;
+// ============================================================
+// 1. RENDER TẤT CẢ COMPONENT
+// ============================================================
+function renderAll() {
+  document.getElementById('header-container').innerHTML = renderHeader();
+  document.getElementById('sidebar-container').innerHTML = renderSidebar();
+  document.getElementById('intro-container').innerHTML = renderIntro();
+  document.getElementById('menu-container').innerHTML = renderMenu();
+  document.getElementById('music-container').innerHTML = renderMusic();
+  document.getElementById('player-container').innerHTML = renderPlayer();
+  document.getElementById('tiktok-container').innerHTML = renderTikTok();
+  document.getElementById('apple-container').innerHTML = renderApple();
+  document.getElementById('bottom-container').innerHTML = renderBottom();
+  document.getElementById('chat-container').innerHTML = renderChat();
+  document.getElementById('welcome-container').innerHTML = renderWelcome();
+  document.getElementById('modal-container').innerHTML = renderModal();
 }
 
-// Khởi tạo ứng dụng
-document.addEventListener('DOMContentLoaded', () => {
-  // 1. Render HTML
-  renderApp();
-
-  // 2. Khởi tạo i18n
-  initI18n();
-
-  // 3. Khởi tạo Player
-  window.player = new MusicPlayer();
-  window.player.init();
-
-  // 4. Khởi tạo TikTok
-  initTikTok();
-
-  // 5. Tải danh sách nhạc
-  loadSongs();
-
-  // 6. Các sự kiện toàn cục (sidebar, theme, clock, v.v.)
-  initGlobalEvents();
-});
-
-// Hàm tải nhạc
+// ============================================================
+// 2. BIẾN TOÀN CỤC
+// ============================================================
 let songData = [];
 let songMap = new Map();
+let isProcessing = false;
 
+// ============================================================
+// 3. LOAD & RENDER SONGS
+// ============================================================
 async function loadSongs(showToastMsg = false) {
   try {
     const files = await fetchSongs();
@@ -105,17 +63,13 @@ async function loadSongs(showToastMsg = false) {
     const countEl = document.getElementById('songCountDisplay');
     if (countEl) countEl.textContent = `${songData.length} bài hát`;
     if (showToastMsg) {
-      showToast(`Đã cập nhật ${songData.length} bài hát!`, 'success', 3000);
+      showToast(`✅ Đã cập nhật ${songData.length} bài hát!`, 'success', 3000);
     }
   } catch (error) {
     console.error('Lỗi tải nhạc:', error);
-    if (showToastMsg) showToast('Không thể tải danh sách nhạc', 'error', 5000);
+    if (showToastMsg) showToast('❌ Không thể tải danh sách nhạc', 'error', 5000);
   }
 }
-
-// Hàm render danh sách nhạc
-import { escapeHtml, truncateName, showToast as toast } from './utils.js';
-import { shortenThrice } from './api.js';
 
 function renderSongs(filter = '') {
   const songList = document.getElementById('songList');
@@ -150,7 +104,7 @@ function renderSongs(filter = '') {
   });
   songList.innerHTML = html;
 
-  // Gán sự kiện click
+  // Gắn sự kiện click
   document.querySelectorAll('.song-item').forEach(el => {
     const link = el.dataset.link;
     el.addEventListener('click', function(e) {
@@ -166,9 +120,6 @@ function renderSongs(filter = '') {
     }
   });
 }
-
-// Xử lý click bài hát (tạo link)
-let isProcessing = false;
 
 async function handleSongClick(originalLink, element) {
   if (isProcessing || !originalLink) return;
@@ -233,7 +184,7 @@ async function handleSongClick(originalLink, element) {
         </body></html>
       `);
     } else {
-      toast('Popup bị chặn!', 'error', 4000);
+      showToast('⚠️ Popup bị chặn!', 'error', 4000);
     }
   } catch (e) { console.warn('Không thể mở tab mới:', e); }
 
@@ -253,11 +204,11 @@ async function handleSongClick(originalLink, element) {
       } else {
         window.open(finalLink, '_blank');
       }
-      toast('Đã mở tab với link rút gọn!', 'success', 3000);
+      showToast('✅ Đã mở tab với link rút gọn!', 'success', 3000);
     }, 3000);
   } catch (error) {
     console.error('Lỗi:', error);
-    toast('❌ Đã xảy ra lỗi, vui lòng thử lại!', 'error', 4000);
+    showToast('❌ Đã xảy ra lỗi, vui lòng thử lại!', 'error', 4000);
     if (newTab && !newTab.closed) { try { newTab.close(); } catch(e) {} }
   } finally {
     setTimeout(() => {
@@ -270,40 +221,10 @@ async function handleSongClick(originalLink, element) {
   }
 }
 
-// ===== CÁC SỰ KIỆN TOÀN CỤC =====
-function initGlobalEvents() {
-  // Search
-  const searchInput = document.getElementById('searchInput');
-  const clearSearch = document.getElementById('clearSearch');
-  if (searchInput && clearSearch) {
-    searchInput.addEventListener('input', function() {
-      renderSongs(this.value);
-      clearSearch.classList.toggle('visible', this.value.length > 0);
-    });
-    clearSearch.addEventListener('click', function() {
-      searchInput.value = '';
-      renderSongs('');
-      this.classList.remove('visible');
-      searchInput.focus();
-    });
-  }
-
-  // Refresh songs
-  document.getElementById('refreshSongsBtn')?.addEventListener('click', async function() {
-    const icon = this.querySelector('i');
-    const text = this.querySelector('span');
-    icon.classList.add('fa-spin');
-    text.textContent = 'Đang cập nhật...';
-    this.style.opacity = '0.7';
-    this.style.pointerEvents = 'none';
-    await loadSongs(true);
-    icon.classList.remove('fa-spin');
-    text.textContent = 'Làm mới';
-    this.style.opacity = '1';
-    this.style.pointerEvents = 'auto';
-  });
-
-  // Sidebar
+// ============================================================
+// 4. SIDEBAR
+// ============================================================
+function initSidebar() {
   const menuBtn = document.getElementById('menuBtn');
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('menuOverlay');
@@ -323,56 +244,67 @@ function initGlobalEvents() {
   }
   window.closeSidebar = closeSidebar;
   window.toggleSidebarLanguage = toggleSidebarLanguage;
+}
 
-  function closeSidebar() {
-    if (sidebar) sidebar.classList.remove('active');
-    if (overlay) overlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
+function closeSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('menuOverlay');
+  if (sidebar) sidebar.classList.remove('active');
+  if (overlay) overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
 
-  function toggleSidebarLanguage() {
-    const langSelect = document.getElementById('langSelect');
-    if (!langSelect) return;
-    const current = langSelect.value;
-    const newLang = current === 'vi' ? 'en' : 'vi';
-    langSelect.value = newLang;
-    langSelect.dispatchEvent(new Event('change'));
-    closeSidebar();
-  }
+function toggleSidebarLanguage() {
+  const langSelect = document.getElementById('langSelect');
+  if (!langSelect) return;
+  const current = langSelect.value;
+  const newLang = current === 'vi' ? 'en' : 'vi';
+  langSelect.value = newLang;
+  langSelect.dispatchEvent(new Event('change'));
+  closeSidebar();
+}
 
-  // Theme
-  const themeToggle = document.getElementById('themeToggle');
-  const themeIcon = document.getElementById('themeIcon');
+// ============================================================
+// 5. THEME
+// ============================================================
+function initTheme() {
+  const toggle = document.getElementById('themeToggle');
+  const icon = document.getElementById('themeIcon');
   const html = document.documentElement;
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  html.setAttribute('data-theme', savedTheme);
-  updateIcon(themeIcon, savedTheme);
-
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
+  const saved = localStorage.getItem('theme') || 'dark';
+  html.setAttribute('data-theme', saved);
+  updateIcon(icon, saved);
+  if (toggle) {
+    toggle.addEventListener('click', () => {
       const current = html.getAttribute('data-theme');
       const next = current === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', next);
       localStorage.setItem('theme', next);
-      updateIcon(themeIcon, next);
+      updateIcon(icon, next);
     });
   }
+}
 
-  function toggleTheme() {
-    const current = html.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-    updateIcon(themeIcon, next);
-  }
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  const icon = document.getElementById('themeIcon');
+  updateIcon(icon, next);
+}
 
-  function updateIcon(el, theme) {
-    if (!el) return;
-    el.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
-  }
+function updateIcon(el, theme) {
+  if (!el) return;
+  el.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+}
 
-  // Clock
-  let clockRAF = null;
+// ============================================================
+// 6. CLOCK
+// ============================================================
+let clockRAF = null;
+function initClock() {
   function updateClock() {
     const now = new Date();
     const h = String(now.getHours()).padStart(2, '0');
@@ -384,197 +316,278 @@ function initGlobalEvents() {
   }
   if (clockRAF) cancelAnimationFrame(clockRAF);
   updateClock();
+}
 
-  // Back to Top
-  const backBtn = document.getElementById('backToTop');
-  if (backBtn) {
-    window.addEventListener('scroll', () => {
-      backBtn.classList.toggle('show', window.scrollY > 300);
-    });
-    backBtn.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+// ============================================================
+// 7. STARS
+// ============================================================
+function initStars() {
+  const container = document.getElementById('starsContainer');
+  if (!container) return;
+  for (let i = 0; i < 60; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 3.5 + 1.5;
+    star.style.width = size + 'px';
+    star.style.height = size + 'px';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.setProperty('--duration', (Math.random() * 4 + 2) + 's');
+    star.style.animationDelay = (Math.random() * 6) + 's';
+    container.appendChild(star);
   }
+}
 
-  // Stars
-  const starsContainer = document.getElementById('starsContainer');
-  if (starsContainer) {
-    for (let i = 0; i < 60; i++) {
-      const star = document.createElement('div');
-      star.className = 'star';
-      const size = Math.random() * 3.5 + 1.5;
-      star.style.width = size + 'px';
-      star.style.height = size + 'px';
-      star.style.left = Math.random() * 100 + '%';
-      star.style.top = Math.random() * 100 + '%';
-      star.style.setProperty('--duration', (Math.random() * 4 + 2) + 's');
-      star.style.animationDelay = (Math.random() * 6) + 's';
-      starsContainer.appendChild(star);
-    }
-  }
+// ============================================================
+// 8. BACK TO TOP
+// ============================================================
+function initBackToTop() {
+  const btn = document.getElementById('backToTop');
+  if (!btn) return;
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('show', window.scrollY > 300);
+  });
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
 
-  // Bell & Modal
+// ============================================================
+// 9. BELL & MODAL
+// ============================================================
+function initBellModal() {
   const bell = document.getElementById('bellNotification');
   const modal = document.getElementById('modalOverlay');
-  const modalClose = document.getElementById('closeModalBtn');
-  if (bell && modal && modalClose) {
+  const closeBtn = document.getElementById('closeModalBtn');
+  if (bell && modal && closeBtn) {
     bell.addEventListener('click', () => modal.classList.add('active'));
-    modalClose.addEventListener('click', () => modal.classList.remove('active'));
+    closeBtn.addEventListener('click', () => modal.classList.remove('active'));
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.classList.remove('active');
     });
   }
+}
 
-  // Welcome
-  const welcomeOverlay = document.getElementById('welcomeOverlay');
-  const loadingState = document.getElementById('loadingState');
-  const contentState = document.getElementById('contentState');
-  const welcomeBtn = document.getElementById('welcomeBtn');
-  const closeNotiBtn = document.getElementById('closeNotiBtn');
-  const loadPercent = document.getElementById('loadPercent');
+// ============================================================
+// 10. WELCOME
+// ============================================================
+function initWelcome() {
+  const overlay = document.getElementById('welcomeOverlay');
+  const loading = document.getElementById('loadingState');
+  const content = document.getElementById('contentState');
+  const btnStart = document.getElementById('welcomeBtn');
+  const closeBtn = document.getElementById('closeNotiBtn');
+  const percentEl = document.getElementById('loadPercent');
 
-  if (welcomeOverlay && loadingState && contentState && welcomeBtn && closeNotiBtn && loadPercent) {
-    let p = 0;
-    const interval = setInterval(() => {
-      p += Math.floor(Math.random() * 6) + 2;
-      if (p > 100) p = 100;
-      loadPercent.textContent = p;
-      if (p === 100) {
-        clearInterval(interval);
-        setTimeout(() => {
-          loadingState.style.display = 'none';
-          contentState.style.display = 'flex';
-        }, 400);
+  if (!overlay || !loading || !content || !btnStart || !closeBtn || !percentEl) return;
+
+  let p = 0;
+  const interval = setInterval(() => {
+    p += Math.floor(Math.random() * 6) + 2;
+    if (p > 100) p = 100;
+    percentEl.textContent = p;
+    if (p === 100) {
+      clearInterval(interval);
+      setTimeout(() => {
+        loading.style.display = 'none';
+        content.style.display = 'flex';
+      }, 400);
+    }
+  }, 80);
+  setTimeout(() => {
+    if (p < 100) {
+      clearInterval(interval);
+      percentEl.textContent = '100';
+      loading.style.display = 'none';
+      content.style.display = 'flex';
+    }
+  }, 6000);
+
+  function closeWelcome() { overlay.classList.add('hidden'); }
+  btnStart.addEventListener('click', closeWelcome);
+  closeBtn.addEventListener('click', closeWelcome);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeWelcome();
+  });
+}
+
+// ============================================================
+// 11. CHAT
+// ============================================================
+function initChat() {
+  const toggle = document.getElementById('chatToggle');
+  const box = document.getElementById('chatBox');
+  const closeBtn = document.getElementById('chatClose');
+  const input = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('chatSend');
+  const messages = document.getElementById('chatMessages');
+
+  if (!toggle || !box || !closeBtn || !input || !sendBtn || !messages) return;
+
+  let isFirstOpen = true;
+
+  toggle.addEventListener('click', () => {
+    box.classList.toggle('active');
+    if (box.classList.contains('active')) {
+      input.focus();
+      if (isFirstOpen) {
+        isFirstOpen = false;
+        const welcome = 'Xin chào! Tôi là trợ lý AI của Thwih Music. 🎵';
+        appendMessage('bot', welcome);
       }
-    }, 80);
-    setTimeout(() => {
-      if (p < 100) {
-        clearInterval(interval);
-        loadPercent.textContent = '100';
-        loadingState.style.display = 'none';
-        contentState.style.display = 'flex';
-      }
-    }, 6000);
+    }
+  });
 
-    function closeWelcome() { welcomeOverlay.classList.add('hidden'); }
-    welcomeBtn.addEventListener('click', closeWelcome);
-    closeNotiBtn.addEventListener('click', closeWelcome);
-    welcomeOverlay.addEventListener('click', (e) => {
-      if (e.target === welcomeOverlay) closeWelcome();
-    });
+  closeBtn.addEventListener('click', () => box.classList.remove('active'));
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+    appendMessage('user', text);
+    input.value = '';
+
+    const typing = showTyping();
+    try {
+      const reply = await getSmartReply(text);
+      removeTyping(typing);
+      appendMessage('bot', reply);
+    } catch (error) {
+      removeTyping(typing);
+      appendMessage('bot', '❌ Có lỗi, vui lòng thử lại!');
+    }
   }
 
-  // Chat
-  const chatToggle = document.getElementById('chatToggle');
-  const chatBox = document.getElementById('chatBox');
-  const chatClose = document.getElementById('chatClose');
-  const chatInput = document.getElementById('chatInput');
-  const chatSend = document.getElementById('chatSend');
-  const chatMessages = document.getElementById('chatMessages');
+  sendBtn.addEventListener('click', sendMessage);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
 
-  if (chatToggle && chatBox && chatClose && chatInput && chatSend && chatMessages) {
-    let isFirstOpen = true;
+  window.appendMessage = appendMessage;
 
-    chatToggle.addEventListener('click', () => {
-      chatBox.classList.toggle('active');
-      if (chatBox.classList.contains('active')) {
-        chatInput.focus();
-        if (isFirstOpen) {
-          isFirstOpen = false;
-          const t = window.__translations || {};
-          const welcome = t.ai_welcome || 'Xin chào! Tôi là trợ lý AI của Thwih Music. Tôi có thể giúp gì cho bạn? 🎵';
-          appendMessage('bot', welcome);
-        }
-      }
+  function appendMessage(type, text) {
+    const div = document.createElement('div');
+    div.className = `message ${type}`;
+    const avatar = document.createElement('span');
+    avatar.className = 'avatar';
+    avatar.innerHTML = type === 'bot' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    const lines = text.split('\n');
+    lines.forEach((line, i) => {
+      bubble.appendChild(document.createTextNode(line));
+      if (i < lines.length - 1) bubble.appendChild(document.createElement('br'));
     });
+    div.appendChild(avatar);
+    div.appendChild(bubble);
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
 
-    chatClose.addEventListener('click', () => chatBox.classList.remove('active'));
+  function showTyping() {
+    const div = document.createElement('div');
+    div.className = 'message bot typing';
+    div.innerHTML = `<span class="avatar"><i class="fas fa-robot"></i></span><div class="bubble" style="min-width:60px;"><span class="typing-dots">.</span></div>`;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+    let dots = 0;
+    const interval = setInterval(() => {
+      const dotSpan = div.querySelector('.typing-dots');
+      if (dotSpan) { dots = (dots % 3) + 1; dotSpan.textContent = '.'.repeat(dots); } else clearInterval(interval);
+    }, 400);
+    return { div, interval };
+  }
 
-    async function sendMessage() {
-      const text = chatInput.value.trim();
-      if (!text) return;
-      appendMessage('user', text);
-      chatInput.value = '';
-      const typing = showTyping();
-      try {
-        const reply = await getSmartReply(text);
-        removeTyping(typing);
-        appendMessage('bot', reply);
-      } catch (error) {
-        removeTyping(typing);
-        appendMessage('bot', '❌ Có lỗi, vui lòng thử lại!');
-      }
-    }
+  function removeTyping(typing) {
+    if (typing && typing.div) { typing.div.remove(); clearInterval(typing.interval); }
+  }
 
-    chatSend.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
-
-    function appendMessage(type, text) {
-      const div = document.createElement('div');
-      div.className = `message ${type}`;
-      const avatar = document.createElement('span');
-      avatar.className = 'avatar';
-      avatar.innerHTML = type === 'bot' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble';
-      const lines = text.split('\n');
-      lines.forEach((line, i) => {
-        bubble.appendChild(document.createTextNode(line));
-        if (i < lines.length - 1) bubble.appendChild(document.createElement('br'));
+  async function getSmartReply(message) {
+    try {
+      const gateway = import.meta.env.VITE_API_GATEWAY || 'https://thwihsite06.weylynofficial.workers.dev/';
+      const res = await fetch(`${gateway}?action=deepseek`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: 'Bạn là trợ lý AI của Thwih Music.' },
+            { role: 'user', content: message }
+          ],
+          max_tokens: 600,
+          temperature: 0.7
+        })
       });
-      div.appendChild(avatar);
-      div.appendChild(bubble);
-      chatMessages.appendChild(div);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function showTyping() {
-      const div = document.createElement('div');
-      div.className = 'message bot typing';
-      div.innerHTML = `<span class="avatar"><i class="fas fa-robot"></i></span><div class="bubble" style="min-width:60px;"><span class="typing-dots">.</span></div>`;
-      chatMessages.appendChild(div);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      let dots = 0;
-      const interval = setInterval(() => {
-        const dotSpan = div.querySelector('.typing-dots');
-        if (dotSpan) { dots = (dots % 3) + 1; dotSpan.textContent = '.'.repeat(dots); } else clearInterval(interval);
-      }, 400);
-      return { div, interval };
-    }
-
-    function removeTyping(typing) {
-      if (typing && typing.div) { typing.div.remove(); clearInterval(typing.interval); }
-    }
-
-    async function getSmartReply(message) {
-      try {
-        const gateway = import.meta.env.VITE_API_GATEWAY || 'https://thwihsite06.weylynofficial.workers.dev/';
-        const res = await fetch(`${gateway}?action=deepseek`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: [
-              { role: 'system', content: 'Bạn là trợ lý AI của Thwih Music. Trả lời mọi câu hỏi về âm nhạc, lập trình, công nghệ.' },
-              { role: 'user', content: message }
-            ],
-            max_tokens: 600,
-            temperature: 0.7
-          })
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-        if (!json.success) throw new Error(json.error || 'DeepSeek error');
-        return json.data.choices[0].message.content;
-      } catch (error) {
-        console.error('DeepSeek error:', error);
-        const msg = message.toLowerCase();
-        if (msg.includes('xin chào') || msg.includes('chào') || msg.includes('hello')) {
-          return 'Xin chào bạn! Rất vui được gặp bạn. Tôi là trợ lý AI của Thwih Music. Bạn cần hỗ trợ gì hôm nay? 🎵';
-        }
-        return 'Tôi chưa hiểu rõ câu hỏi. Bạn có thể hỏi về âm nhạc, lập trình, công nghệ, hoặc kết nối TikTok, Telegram, Zalo.';
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'DeepSeek error');
+      return json.data.choices[0].message.content;
+    } catch (error) {
+      console.error('DeepSeek error:', error);
+      const msg = message.toLowerCase();
+      if (msg.includes('xin chào') || msg.includes('chào') || msg.includes('hello')) {
+        return 'Xin chào! Rất vui được gặp bạn. 🎵';
       }
+      return 'Tôi chưa hiểu câu hỏi. Bạn có thể hỏi về âm nhạc, lập trình, hoặc kết nối.';
     }
   }
 }
+
+// ============================================================
+// 12. SEARCH INPUT
+// ============================================================
+function initSearch() {
+  const searchInput = document.getElementById('searchInput');
+  const clearSearch = document.getElementById('clearSearch');
+  if (searchInput && clearSearch) {
+    searchInput.addEventListener('input', function() {
+      renderSongs(this.value);
+      clearSearch.classList.toggle('visible', this.value.length > 0);
+    });
+    clearSearch.addEventListener('click', function() {
+      searchInput.value = '';
+      renderSongs('');
+      this.classList.remove('visible');
+      searchInput.focus();
+    });
+  }
+}
+
+// ============================================================
+// 13. DOMContentLoaded - KHỞI TẠO
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Render HTML
+  renderAll();
+
+  // Khởi tạo các module
+  initI18n();
+  window.player = new MusicPlayer();
+  window.player.init();
+  initTikTok();
+  initSidebar();
+  initTheme();
+  initClock();
+  initStars();
+  initBackToTop();
+  initBellModal();
+  initWelcome();
+  initChat();
+  initSearch();
+
+  // Tải danh sách nhạc
+  loadSongs(true);
+
+  // Refresh button
+  document.getElementById('refreshSongsBtn')?.addEventListener('click', async function() {
+    const icon = this.querySelector('i');
+    const text = this.querySelector('span');
+    icon.classList.add('fa-spin');
+    text.textContent = 'Đang cập nhật...';
+    this.style.opacity = '0.7';
+    this.style.pointerEvents = 'none';
+    await loadSongs(true);
+    icon.classList.remove('fa-spin');
+    text.textContent = 'Làm mới';
+    this.style.opacity = '1';
+    this.style.pointerEvents = 'auto';
+  });
+});
