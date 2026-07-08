@@ -1,0 +1,40 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": "eslint:recommended",
+  "plugins": ["html"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "script"
+  },
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-console": "off",
+    "semi": ["error", "always"],
+    "quotes": ["error", "single"]
+  },
+  "globals": {
+    "document": "readonly",
+    "window": "readonly",
+    "navigator": "readonly",
+    "fetch": "readonly",
+    "localStorage": "readonly",
+    "sessionStorage": "readonly",
+    "performance": "readonly",
+    "IntersectionObserver": "readonly",
+    "Audio": "readonly",
+    "CONFIG": "readonly",
+    "translations": "readonly",
+    "applyLanguage": "readonly",
+    "showToast": "readonly",
+    "MusicPlayer": "readonly",
+    "songData": "writable",
+    "songMap": "writable",
+    "visibleCount": "writable",
+    "currentFilter": "writable",
+    "filteredSongs": "writable",
+    "sentinelObserver": "writable"
+  }
+}
