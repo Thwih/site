@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "ritwickdey.liveserver",
+    "dbaeumer.vscode-eslint",
+    "steoates.autoimport",
+    "eamodio.gitlens"
+  ]
+}
