@@ -1,0 +1,25 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# VS Code (giữ lại một số file cấu hình)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+
+# Cache
+.cache/
+*.cache
+
+# Build
+dist/
+build/
+*.min.*
